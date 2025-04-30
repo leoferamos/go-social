@@ -1,9 +1,12 @@
 package controllers
 
-import "net/http"
+import (
+	"net/http"
+)
 
-//CreateUser creates a new user in the database
+// CreateUser creates a new user in the database
 func CreateUser(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("User created successfully"))
 }
 
 // GetUser retrieves a user from the database by ID

@@ -7,7 +7,7 @@ import (
 
 var userRoutes = []Route{
 	{
-		URI:          "users/",
+		URI:          "users",
 		Method:       http.MethodPost,
 		Function:     controllers.CreateUser,
 		RequiresAuth: false,
@@ -19,7 +19,7 @@ var userRoutes = []Route{
 		RequiresAuth: false,
 	},
 	{
-		URI:          "users/",
+		URI:          "users",
 		Method:       http.MethodGet,
 		Function:     controllers.GetUsers,
 		RequiresAuth: false,
