@@ -20,7 +20,7 @@ var (
 func Init() {
 	var err error
 
-	if err = godotenv.Load(); err != nil {
+	if err = godotenv.Load(".env"); err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
 	Port, err = strconv.Atoi(os.Getenv("API_PORT"))
