@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"api/src/controllers"
+	"go_social/internal/controllers"
 	"net/http"
 )
 

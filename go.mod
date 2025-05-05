@@ -1,4 +1,4 @@
-module api
+module go_social
 
 go 1.21.5
 
