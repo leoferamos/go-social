@@ -8,7 +8,10 @@ import (
 	"go_social/internal/responses"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 // CreateUser creates a new user in the database
@@ -69,7 +72,27 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 
 // GetUsers retrieves all users from the database
 func GetUser(w http.ResponseWriter, r *http.Request) {
+	parameters := mux.Vars(r)
 
+	userID, err := strconv.ParseUint(parameters["userId"], 10, 64)
+	if err != nil {
+		responses.JSONError(w, http.StatusBadRequest, err)
+		return
+	}
+	db, err := db.Connect()
+	if err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	defer db.Close()
+
+	repository := repositories.NewUsersRepository(db)
+	user, err := repository.GetUserByID(userID)
+	if err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, user)
 }
 
 // UpdateUser updates an existing user in the database
