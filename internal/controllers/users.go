@@ -2,12 +2,11 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"go_social/internal/db"
 	"go_social/internal/models"
 	"go_social/internal/repositories"
+	"go_social/internal/responses"
 	"io"
-	"log"
 	"net/http"
 )
 
@@ -15,23 +14,36 @@ import (
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	bodyRequest, err := io.ReadAll(r.Body)
 	if err != nil {
-		log.Fatal(err)
-	}
-	var usuario models.User
-	if err = json.Unmarshal(bodyRequest, &usuario); err != nil {
-		log.Fatal(err)
-	}
-	db, err := db.Connect()
-	if err != nil {
-		log.Fatal(err)
+		responses.JSONError(w, http.StatusUnprocessableEntity, err)
+		return
 	}
 
-	repository := repositories.NewUsersRepository(db)
-	userId, err := repository.CreateUser(usuario)
-	if err != nil {
-		log.Fatal(err)
+	var user models.User
+	if err = json.Unmarshal(bodyRequest, &user); err != nil {
+		responses.JSONError(w, http.StatusBadRequest, err)
+		return
 	}
-	w.Write([]byte(fmt.Sprintf("User created successfully with ID: %d", userId)))
+
+	if err = user.Prepare(); err != nil {
+		responses.JSONError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	db, err := db.Connect()
+	if err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	defer db.Close()
+
+	repository := repositories.NewUsersRepository(db)
+	userId, err := repository.CreateUser(user)
+	if err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	responses.JSON(w, http.StatusCreated, userId)
 }
 
 // GetUser retrieves a user from the database by ID
