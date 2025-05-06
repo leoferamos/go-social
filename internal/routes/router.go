@@ -7,5 +7,5 @@ import (
 // Generate returns a router with all application routes registered.
 func Generate() *mux.Router {
 	r := mux.NewRouter()
-	return Configure(r) // Chama Configure diretamente, pois está no mesmo pacote
+	return Configure(r)
 }
