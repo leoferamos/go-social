@@ -60,3 +60,24 @@ func (repository *users) GetUsers(nameOrUsername string) ([]models.User, error) 
 
 	return users, nil
 }
+
+// GetUserByID retrieves a user from the database by ID
+func (repository *users) GetUserByID(userID uint64) (models.User, error) {
+	rows, err := repository.db.Query(
+		"SELECT id, name, username, email, created_at FROM users WHERE id = ?",
+		userID,
+	)
+	if err != nil {
+		return models.User{}, err
+	}
+	defer rows.Close()
+
+	var user models.User
+
+	if rows.Next() {
+		if err := rows.Scan(&user.ID, &user.Name, &user.Username, &user.Email, &user.CreatedAt); err != nil {
+			return models.User{}, err
+		}
+	}
+	return user, nil
+}
