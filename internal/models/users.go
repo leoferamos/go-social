@@ -17,8 +17,8 @@ type User struct {
 }
 
 // Prepare calls the methods to format and validate the user data.
-func (u *User) Prepare() error {
-	if err := u.validate(); err != nil {
+func (u *User) Prepare(context string) error {
+	if err := u.validate(context); err != nil {
 		return err
 	}
 
@@ -26,7 +26,7 @@ func (u *User) Prepare() error {
 	return nil
 }
 
-func (u *User) validate() error {
+func (u *User) validate(context string) error {
 	if u.Name == "" {
 		return errors.New("Name is required")
 	}
@@ -36,7 +36,7 @@ func (u *User) validate() error {
 	if u.Email == "" {
 		return errors.New("Email is required")
 	}
-	if u.Password == "" {
+	if context == "registration" && u.Password == "" {
 		return errors.New("Password is required")
 	}
 	return nil
