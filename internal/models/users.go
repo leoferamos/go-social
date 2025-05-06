@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"errors"
+	"strings"
+	"time"
+)
 
 // User represents a user in the system.
 type User struct {
@@ -10,4 +14,36 @@ type User struct {
 	Email     string    `json:"email,omitempty"`
 	Password  string    `json:"password,omitempty"`
 	CreatedAt time.Time `json:"created_at,omitempty"`
+}
+
+// Prepare calls the methods to format and validate the user data.
+func (u *User) Prepare() error {
+	if err := u.validate(); err != nil {
+		return err
+	}
+
+	u.format()
+	return nil
+}
+
+func (u *User) validate() error {
+	if u.Name == "" {
+		return errors.New("Name is required")
+	}
+	if u.Username == "" {
+		return errors.New("Username is required")
+	}
+	if u.Email == "" {
+		return errors.New("Email is required")
+	}
+	if u.Password == "" {
+		return errors.New("Password is required")
+	}
+	return nil
+}
+
+func (u *User) format() {
+	u.Name = strings.TrimSpace(u.Name)
+	u.Username = strings.TrimSpace(u.Username)
+	u.Email = strings.TrimSpace(u.Email)
 }
