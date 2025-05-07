@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"go_social/internal/security"
 	"strings"
 	"time"
 
@@ -23,8 +24,9 @@ func (u *User) Prepare(context string) error {
 	if err := u.validate(context); err != nil {
 		return err
 	}
-
-	u.format()
+	if err := u.format(context); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -47,8 +49,18 @@ func (u *User) validate(context string) error {
 	return nil
 }
 
-func (u *User) format() {
+func (u *User) format(context string) error {
 	u.Name = strings.TrimSpace(u.Name)
 	u.Username = strings.TrimSpace(u.Username)
 	u.Email = strings.TrimSpace(u.Email)
+
+	if context == "registration" {
+		hashedPassword, err := security.HashPassword(u.Password)
+		if err != nil {
+			return err
+		}
+
+		u.Password = string(hashedPassword)
+	}
+	return nil
 }
