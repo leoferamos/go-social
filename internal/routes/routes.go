@@ -14,9 +14,11 @@ type Route struct {
 	RequiresAuth bool
 }
 
-// userRoutes contains all user-related routes.
+// Configure sets up the routes for the application.
 func Configure(r *mux.Router) *mux.Router {
 	routes := userRoutes
+	routes = append(routes, loginRoute)
+
 	for _, route := range routes {
 		r.HandleFunc(route.URI, route.Function).Methods(route.Method)
 	}
