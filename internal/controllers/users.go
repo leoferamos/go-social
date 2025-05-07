@@ -7,7 +7,6 @@ import (
 	"go_social/internal/repositories"
 	"go_social/internal/responses"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -105,7 +104,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		responses.JSONError(w, http.StatusBadRequest, err)
 		return
 	}
-	bodyRequest, err := ioutil.ReadAll(r.Body)
+	bodyRequest, err := io.ReadAll(r.Body)
 	if err != nil {
 		responses.JSONError(w, http.StatusUnprocessableEntity, err)
 		return
