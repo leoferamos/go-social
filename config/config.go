@@ -14,6 +14,9 @@ var (
 	DatabaseStringConection = ""
 	// Port is the port on which the application will run.
 	Port = 0
+
+	// SecretKey is the secret key used for signing tokens.
+	SecretKey []byte
 )
 
 // Package config provides configuration settings for the application.
@@ -32,4 +35,5 @@ func Init() {
 		os.Getenv("DB_PASSWORD"),
 		os.Getenv("DB_NAME"),
 	)
+	SecretKey = []byte(os.Getenv("SECRET_KEY"))
 }
