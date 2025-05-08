@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"go_social/internal/auth"
 	"go_social/internal/db"
 	"go_social/internal/models"
 	"go_social/internal/repositories"
@@ -38,9 +39,15 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		responses.JSONError(w, http.StatusInternalServerError, err)
 		return
 	}
-
 	if err = security.CheckPasswordHash(userFromDB.Password, user.Password); err != nil {
 		responses.JSONError(w, http.StatusUnauthorized, err)
 		return
 	}
+
+	token, err := auth.CreateToken(int(userFromDB.ID))
+	if err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	w.Write([]byte(token))
 }
