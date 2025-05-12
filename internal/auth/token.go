@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"errors"
 	"fmt"
 	"go_social/config"
 	"net/http"
@@ -30,7 +31,7 @@ func ValidateToken(r *http.Request) error {
 	if _, ok := token.Claims.(jwt.Claims); ok && token.Valid {
 		return nil
 	}
-	return fmt.Errorf("invalid token")
+	return errors.New("Invalid token")
 }
 
 func extractToken(r *http.Request) string {
