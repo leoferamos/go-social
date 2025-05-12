@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"encoding/json"
+	"errors"
+	"go_social/internal/auth"
 	"go_social/internal/db"
 	"go_social/internal/models"
 	"go_social/internal/repositories"
@@ -104,6 +106,17 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		responses.JSONError(w, http.StatusBadRequest, err)
 		return
 	}
+
+	userIDFromToken, err := auth.ExtractUserID(r)
+	if err != nil {
+		responses.JSONError(w, http.StatusUnauthorized, err)
+		return
+	}
+	if userID != userIDFromToken {
+		responses.JSONError(w, http.StatusForbidden, errors.New("you cannot update another user"))
+		return
+	}
+
 	bodyRequest, err := io.ReadAll(r.Body)
 	if err != nil {
 		responses.JSONError(w, http.StatusUnprocessableEntity, err)
@@ -145,6 +158,15 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	userIDFromToken, err := auth.ExtractUserID(r)
+	if err != nil {
+		responses.JSONError(w, http.StatusUnauthorized, err)
+		return
+	}
+	if userID != userIDFromToken {
+		responses.JSONError(w, http.StatusForbidden, errors.New("you cannot delete another user"))
+		return
+	}
 	db, err := db.Connect()
 	if err != nil {
 		responses.JSONError(w, http.StatusInternalServerError, err)
