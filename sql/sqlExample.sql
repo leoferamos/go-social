@@ -1,6 +1,7 @@
 CREATE DATABASE IF NOT EXISTS goSocial;
 USE goSocial;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS followers;
 
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -9,4 +10,18 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     email VARCHAR(50) NOT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE followers (
+    user_id INT NOT NULL,
+    FOREIGN KEY (user_id)
+    REFERENCES users(id)
+    ON DELETE CASCADE,
+
+    follower_id INT NOT NULL,
+    FOREIGN KEY (follower_id)
+    REFERENCES users(id)
+    ON DELETE CASCADE,
+
+    PRIMARY KEY (user_id, follower_id)
 ) ENGINE=InnoDB;
