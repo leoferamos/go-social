@@ -34,3 +34,32 @@ func (r Posts) CreatePost(post models.Posts) (uint64, error) {
 	}
 	return uint64(lastInsertId), nil
 }
+
+// GetPost retrieves a post by its ID from the database.
+func (r Posts) GetPostByID(id uint64) (models.Posts, error) {
+	rows, err := r.db.Query(
+		`SELECT p.*, u.username FROM
+		posts p INNER JOIN users u
+		ON u.id = p.author_id WHERE p.id = ?`,
+		id,
+	)
+	if err != nil {
+		return models.Posts{}, err
+	}
+	defer rows.Close()
+	var post models.Posts
+	if rows.Next() {
+		if err = rows.Scan(
+			&post.ID,
+			&post.Title,
+			&post.Content,
+			&post.AuthorID,
+			&post.AuthorUsername,
+			&post.Likes,
+			&post.CreatedAt,
+		); err != nil {
+			return models.Posts{}, err
+		}
+	}
+	return post, nil
+}
