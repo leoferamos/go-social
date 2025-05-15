@@ -9,6 +9,9 @@ import (
 	"go_social/internal/responses"
 	"io"
 	"net/http"
+	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 // CreatePost handles the creation of a new post.
@@ -55,7 +58,25 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 
 // GetPost handles the retrieval of a post by its ID.
 func GetPost(w http.ResponseWriter, r *http.Request) {
-	// Implementation for getting a post by ID
+	parameters := mux.Vars(r)
+	postID, err := strconv.ParseUint(parameters["id"], 10, 64)
+	if err != nil {
+		responses.JSONError(w, http.StatusBadRequest, err)
+		return
+	}
+	db, err := db.Connect()
+	if err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	defer db.Close()
+	repository := repositories.NewPostsRepository(db)
+	post, err := repository.GetPostByID(postID)
+	if err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, post)
 }
 
 // GetPosts Gets all posts.
