@@ -8,6 +8,7 @@ import (
 	"go_social/internal/models"
 	"go_social/internal/repositories"
 	"go_social/internal/responses"
+	"go_social/internal/security"
 	"io"
 	"net/http"
 	"strconv"
@@ -267,4 +268,81 @@ func GetFollowers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	responses.JSON(w, http.StatusOK, followers)
+}
+
+// GetFollowing retrieves the users that a user is following
+func GetFollowing(w http.ResponseWriter, r *http.Request) {
+	parameters := mux.Vars(r)
+
+	userID, err := strconv.ParseUint(parameters["userId"], 10, 64)
+	if err != nil {
+		responses.JSONError(w, http.StatusBadRequest, err)
+		return
+	}
+	db, err := db.Connect()
+	if err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	defer db.Close()
+
+	repository := repositories.NewUsersRepository(db)
+	following, err := repository.GetFollowing(userID)
+	if err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, following)
+}
+
+// ResetPassword resets the password of a user
+func ResetPassword(w http.ResponseWriter, r *http.Request) {
+	userIDFromToken, err := auth.ExtractUserID(r)
+	if err != nil {
+		responses.JSONError(w, http.StatusUnauthorized, err)
+		return
+	}
+	parameters := mux.Vars(r)
+	userID, err := strconv.ParseUint(parameters["userId"], 10, 64)
+	if err != nil {
+		responses.JSONError(w, http.StatusBadRequest, err)
+		return
+	}
+	if userID != userIDFromToken {
+		responses.JSONError(w, http.StatusForbidden, errors.New("you cannot reset another user's password"))
+		return
+	}
+	bodyRequest, err := io.ReadAll(r.Body)
+
+	var password models.Password
+	if err = json.Unmarshal(bodyRequest, &password); err != nil {
+		responses.JSONError(w, http.StatusBadRequest, err)
+		return
+	}
+	db, err := db.Connect()
+	if err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	defer db.Close()
+	repository := repositories.NewUsersRepository(db)
+	passwordOnDB, err := repository.GetPasswordByID(userID)
+	if err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	if err = security.CheckPasswordHash(passwordOnDB, password.Password); err != nil {
+		responses.JSONError(w, http.StatusUnauthorized, errors.New("invalid password"))
+		return
+	}
+	hashedPassword, err := security.HashPassword(password.NewPassword)
+	if err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	if err = repository.UpdatePassword(userID, string(hashedPassword)); err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusNoContent, nil)
 }
