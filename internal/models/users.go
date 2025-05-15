@@ -32,19 +32,19 @@ func (u *User) Prepare(context string) error {
 
 func (u *User) validate(context string) error {
 	if u.Name == "" {
-		return errors.New("Name is required")
+		return errors.New("name is required")
 	}
 	if u.Username == "" {
-		return errors.New("Username is required")
+		return errors.New("username is required")
 	}
 	if u.Email == "" {
-		return errors.New("Email is required")
+		return errors.New("email is required")
 	}
 	if err := checkmail.ValidateFormat(u.Email); err != nil {
-		return errors.New("Invalid email format")
+		return errors.New("invalid email format")
 	}
 	if context == "registration" && u.Password == "" {
-		return errors.New("Password is required")
+		return errors.New("password is required")
 	}
 	return nil
 }
