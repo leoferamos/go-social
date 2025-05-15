@@ -187,3 +187,64 @@ func (repository *users) GetFollowers(userID uint64) ([]models.User, error) {
 
 	return followers, nil
 }
+
+// GetFollowing retrieves the users that a user is following
+func (repository *users) GetFollowing(userID uint64) ([]models.User, error) {
+	rows, err := repository.db.Query(`
+		SELECT u.id, u.name, u.username, u.email, u.created_at
+		FROM users u inner join followers f on u.id = f.user_id where f.follower_id = ?`,
+		userID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var following []models.User
+
+	for rows.Next() {
+		var user models.User
+		if err := rows.Scan(&user.ID, &user.Name, &user.Username, &user.Email, &user.CreatedAt); err != nil {
+			return nil, err
+		}
+		following = append(following, user)
+	}
+
+	return following, nil
+}
+
+// GetPasswordByID retrieves a user's password by ID
+func (repository *users) GetPasswordByID(userID uint64) (string, error) {
+	rows, err := repository.db.Query(
+		"SELECT password FROM users WHERE id = ?",
+		userID,
+	)
+	if err != nil {
+		return "", err
+	}
+	defer rows.Close()
+
+	var user models.User
+
+	if rows.Next() {
+		if err := rows.Scan(&user.Password); err != nil {
+			return "", err
+		}
+	}
+	return user.Password, nil
+}
+
+// UpdatePassword updates a user's password in the database
+func (repository *users) UpdatePassword(userID uint64, password string) error {
+	statement, err := repository.db.Prepare(
+		"UPDATE users SET password = ? WHERE id = ?",
+	)
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+	if _, err := statement.Exec(password, userID); err != nil {
+		return err
+	}
+	return nil
+}
