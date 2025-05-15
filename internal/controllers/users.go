@@ -312,7 +312,12 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 		responses.JSONError(w, http.StatusForbidden, errors.New("you cannot reset another user's password"))
 		return
 	}
+
 	bodyRequest, err := io.ReadAll(r.Body)
+	if err != nil {
+		responses.JSONError(w, http.StatusUnprocessableEntity, err)
+		return
+	}
 
 	var password models.Password
 	if err = json.Unmarshal(bodyRequest, &password); err != nil {
