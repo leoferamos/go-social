@@ -38,9 +38,10 @@ func (r Posts) CreatePost(post models.Posts) (uint64, error) {
 // GetPost retrieves a post by its ID from the database.
 func (r Posts) GetPostByID(id uint64) (models.Posts, error) {
 	rows, err := r.db.Query(
-		`SELECT p.*, u.username FROM
-		posts p INNER JOIN users u
-		ON u.id = p.author_id WHERE p.id = ?`,
+		`SELECT p.id, p.title, p.content, p.author_id, u.username, p.likes, p.created_at
+      FROM posts p
+      INNER JOIN users u ON u.id = p.author_id
+      WHERE p.id = ?`,
 		id,
 	)
 	if err != nil {
@@ -62,4 +63,38 @@ func (r Posts) GetPostByID(id uint64) (models.Posts, error) {
 		}
 	}
 	return post, nil
+}
+
+// GetPosts Gets the posts of people the user follows and their own posts.
+func (r Posts) GetPosts(userID uint64) ([]models.Posts, error) {
+	rows, err := r.db.Query(
+		`SELECT p.id, p.title, p.content, p.author_id, u.username, p.likes, p.created_at
+    FROM posts p
+    INNER JOIN users u ON u.id = p.author_id
+    LEFT JOIN followers f ON f.user_id = p.author_id AND f.follower_id = ?
+    WHERE f.follower_id IS NOT NULL OR p.author_id = ?
+    ORDER BY 1 DESC`,
+		userID, userID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var posts []models.Posts
+	for rows.Next() {
+		var post models.Posts
+		if err = rows.Scan(
+			&post.ID,
+			&post.Title,
+			&post.Content,
+			&post.AuthorID,
+			&post.AuthorUsername,
+			&post.Likes,
+			&post.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		posts = append(posts, post)
+	}
+	return posts, nil
 }
