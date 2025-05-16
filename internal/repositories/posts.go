@@ -113,3 +113,18 @@ func (r Posts) UpdatePost(postID uint64, post models.Posts) error {
 	}
 	return nil
 }
+
+// DeletePost deletes a post from the database.
+func (r Posts) DeletePost(postID uint64) error {
+	statement, err := r.db.Prepare(
+		"DELETE FROM posts WHERE id = ?",
+	)
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+	if _, err := statement.Exec(postID); err != nil {
+		return err
+	}
+	return nil
+}
