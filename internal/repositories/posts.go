@@ -128,3 +128,35 @@ func (r Posts) DeletePost(postID uint64) error {
 	}
 	return nil
 }
+
+// GetUserPosts Gets the posts of a user.
+func (r Posts) GetUserPosts(userID uint64) ([]models.Posts, error) {
+	rows, err := r.db.Query(
+		`SELECT p.id, p.title, p.content, p.author_id, u.username, p.likes, p.created_at
+	FROM posts p
+	INNER JOIN users u ON u.id = p.author_id
+	WHERE p.author_id = ?`,
+		userID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var posts []models.Posts
+	for rows.Next() {
+		var post models.Posts
+		if err = rows.Scan(
+			&post.ID,
+			&post.Title,
+			&post.Content,
+			&post.AuthorID,
+			&post.AuthorUsername,
+			&post.Likes,
+			&post.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		posts = append(posts, post)
+	}
+	return posts, nil
+}
