@@ -79,8 +79,26 @@ func GetPost(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusOK, post)
 }
 
-// GetPosts Gets all posts.
+// GetPosts Gets the posts of people the user follows and their own posts.
 func GetPosts(w http.ResponseWriter, r *http.Request) {
+	userID, err := auth.ExtractUserID(r)
+	if err != nil {
+		responses.JSONError(w, http.StatusUnauthorized, err)
+		return
+	}
+	db, err := db.Connect()
+	if err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	defer db.Close()
+	repository := repositories.NewPostsRepository(db)
+	posts, err := repository.GetPosts(userID)
+	if err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, posts)
 }
 
 // UpdatePost Updates a post.
