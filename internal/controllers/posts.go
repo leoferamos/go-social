@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"errors"
 	"go_social/internal/auth"
 	"go_social/internal/db"
 	"go_social/internal/models"
@@ -103,7 +104,52 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 
 // UpdatePost Updates a post.
 func UpdatePost(w http.ResponseWriter, r *http.Request) {
-	// Implementation for updating a post
+	userID, err := auth.ExtractUserID(r)
+	if err != nil {
+		responses.JSONError(w, http.StatusUnauthorized, err)
+		return
+	}
+	parameters := mux.Vars(r)
+	postID, err := strconv.ParseUint(parameters["id"], 10, 64)
+	if err != nil {
+		responses.JSONError(w, http.StatusBadRequest, err)
+		return
+	}
+	db, err := db.Connect()
+	if err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	defer db.Close()
+	repository := repositories.NewPostsRepository(db)
+	postOnDB, err := repository.GetPostByID(postID)
+	if err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	if postOnDB.AuthorID != userID {
+		responses.JSONError(w, http.StatusForbidden, errors.New("you are not the author of this post"))
+		return
+	}
+	bodyRequest, err := io.ReadAll(r.Body)
+	if err != nil {
+		responses.JSONError(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	var post models.Posts
+	if err = json.Unmarshal(bodyRequest, &post); err != nil {
+		responses.JSONError(w, http.StatusBadRequest, err)
+		return
+	}
+	if err = post.Prepare(); err != nil {
+		responses.JSONError(w, http.StatusBadRequest, err)
+		return
+	}
+	if err = repository.UpdatePost(postID, post); err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusNoContent, nil)
 }
 
 // DeletePost Deletes a post.
