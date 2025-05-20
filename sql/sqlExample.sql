@@ -1,9 +1,10 @@
 CREATE DATABASE IF NOT EXISTS goSocial;
 USE goSocial;
 
+DROP TABLE IF EXISTS post_likes;
+DROP TABLE IF EXISTS followers;
 DROP TABLE IF EXISTS posts;
 DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS followers;
 
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -33,9 +34,17 @@ CREATE TABLE posts (
    title VARCHAR(255) NOT NULL,
    content VARCHAR(255) NOT NULL,
    author_id INT NOT NULL,
-    FOREIGN KEY (author_id)
-    REFERENCES users(id)
-    ON DELETE CASCADE,
-    likes INT DEFAULT 0,
+   FOREIGN KEY (author_id)
+      REFERENCES users(id)
+      ON DELETE CASCADE,
    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE post_likes (
+    user_id INT NOT NULL,
+    post_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, post_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
