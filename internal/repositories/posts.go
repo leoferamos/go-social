@@ -38,10 +38,13 @@ func (r Posts) CreatePost(post models.Posts) (uint64, error) {
 // GetPost retrieves a post by its ID from the database.
 func (r Posts) GetPostByID(id uint64) (models.Posts, error) {
 	rows, err := r.db.Query(
-		`SELECT p.id, p.title, p.content, p.author_id, u.username, p.likes, p.created_at
-      FROM posts p
-      INNER JOIN users u ON u.id = p.author_id
-      WHERE p.id = ?`,
+		`SELECT p.id, p.title, p.content, p.author_id, u.username,
+            COUNT(pl.user_id) AS likes, p.created_at
+        FROM posts p
+        INNER JOIN users u ON u.id = p.author_id
+        LEFT JOIN post_likes pl ON pl.post_id = p.id
+        WHERE p.id = ?
+        GROUP BY p.id, p.title, p.content, p.author_id, u.username, p.created_at`,
 		id,
 	)
 	if err != nil {
@@ -68,12 +71,15 @@ func (r Posts) GetPostByID(id uint64) (models.Posts, error) {
 // GetPosts Gets the posts of people the user follows and their own posts.
 func (r Posts) GetPosts(userID uint64) ([]models.Posts, error) {
 	rows, err := r.db.Query(
-		`SELECT p.id, p.title, p.content, p.author_id, u.username, p.likes, p.created_at
-    FROM posts p
-    INNER JOIN users u ON u.id = p.author_id
-    LEFT JOIN followers f ON f.user_id = p.author_id AND f.follower_id = ?
-    WHERE f.follower_id IS NOT NULL OR p.author_id = ?
-    ORDER BY 1 DESC`,
+		`SELECT p.id, p.title, p.content, p.author_id, u.username,
+            COUNT(pl.user_id) AS likes, p.created_at
+        FROM posts p
+        INNER JOIN users u ON u.id = p.author_id
+        LEFT JOIN followers f ON f.user_id = p.author_id AND f.follower_id = ?
+        LEFT JOIN post_likes pl ON pl.post_id = p.id
+        WHERE f.follower_id IS NOT NULL OR p.author_id = ?
+        GROUP BY p.id, p.title, p.content, p.author_id, u.username, p.created_at
+        ORDER BY p.created_at DESC`,
 		userID, userID,
 	)
 	if err != nil {
@@ -132,10 +138,14 @@ func (r Posts) DeletePost(postID uint64) error {
 // GetUserPosts Gets the posts of a user.
 func (r Posts) GetUserPosts(userID uint64) ([]models.Posts, error) {
 	rows, err := r.db.Query(
-		`SELECT p.id, p.title, p.content, p.author_id, u.username, p.likes, p.created_at
-	FROM posts p
-	INNER JOIN users u ON u.id = p.author_id
-	WHERE p.author_id = ?`,
+		`SELECT p.id, p.title, p.content, p.author_id, u.username,
+            COUNT(pl.user_id) AS likes, p.created_at
+        FROM posts p
+        INNER JOIN users u ON u.id = p.author_id
+        LEFT JOIN post_likes pl ON pl.post_id = p.id
+        WHERE p.author_id = ?
+        GROUP BY p.id, p.title, p.content, p.author_id, u.username, p.created_at
+        ORDER BY p.created_at DESC`,
 		userID,
 	)
 	if err != nil {
@@ -162,35 +172,19 @@ func (r Posts) GetUserPosts(userID uint64) ([]models.Posts, error) {
 }
 
 // LikePost increments the like count of a post in the database.
-func (r Posts) LikePost(postID uint64) error {
-	statement, err := r.db.Prepare(
-		"UPDATE posts SET likes = likes + 1 WHERE id = ?",
+func (r Posts) LikePost(userID, postID uint64) error {
+	_, err := r.db.Exec(
+		"INSERT IGNORE INTO post_likes (user_id, post_id) VALUES (?, ?)",
+		userID, postID,
 	)
-	if err != nil {
-		return err
-	}
-	defer statement.Close()
-	if _, err := statement.Exec(postID); err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // UnlikePost decrements the like count of a post in the database.
-func (r Posts) UnlikePost(postID uint64) error {
-	statement, err := r.db.Prepare(
-		`UPDATE posts SET likes =
-		CASE 
-			WHEN likes > 0 THEN likes - 1 
-			ELSE 0 
-		END 
-		WHERE id = ?`)
-	if err != nil {
-		return err
-	}
-	defer statement.Close()
-	if _, err := statement.Exec(postID); err != nil {
-		return err
-	}
-	return nil
+func (r Posts) UnlikePost(userID, postID uint64) error {
+	_, err := r.db.Exec(
+		"DELETE FROM post_likes WHERE user_id = ? AND post_id = ?",
+		userID, postID,
+	)
+	return err
 }
