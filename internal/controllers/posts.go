@@ -213,6 +213,11 @@ func GetUserPosts(w http.ResponseWriter, r *http.Request) {
 
 // LikePost Likes a post.
 func LikePost(w http.ResponseWriter, r *http.Request) {
+	userID, err := auth.ExtractUserID(r)
+	if err != nil {
+		responses.JSONError(w, http.StatusUnauthorized, err)
+		return
+	}
 	parameters := mux.Vars(r)
 	postID, err := strconv.ParseUint(parameters["id"], 10, 64)
 	if err != nil {
@@ -226,7 +231,7 @@ func LikePost(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 	repository := repositories.NewPostsRepository(db)
-	if err = repository.LikePost(postID); err != nil {
+	if err = repository.LikePost(userID, postID); err != nil {
 		responses.JSONError(w, http.StatusInternalServerError, err)
 		return
 	}
@@ -235,6 +240,11 @@ func LikePost(w http.ResponseWriter, r *http.Request) {
 
 // UnlikePost Unlikes a post.
 func UnlikePost(w http.ResponseWriter, r *http.Request) {
+	userID, err := auth.ExtractUserID(r)
+	if err != nil {
+		responses.JSONError(w, http.StatusUnauthorized, err)
+		return
+	}
 	parameters := mux.Vars(r)
 	postID, err := strconv.ParseUint(parameters["id"], 10, 64)
 	if err != nil {
@@ -248,7 +258,7 @@ func UnlikePost(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 	repository := repositories.NewPostsRepository(db)
-	if err = repository.UnlikePost(postID); err != nil {
+	if err = repository.UnlikePost(userID, postID); err != nil {
 		responses.JSONError(w, http.StatusInternalServerError, err)
 		return
 	}
