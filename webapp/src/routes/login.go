@@ -9,13 +9,13 @@ import (
 var loginRoute = []Route{
 	{
 		URI:          "/",
-		Method:       http.MethodPost,
+		Method:       http.MethodGet,
 		Function:     controllers.LoadLoginPage,
 		RequiresAuth: false,
 	},
 	{
 		URI:          "/login",
-		Method:       http.MethodPost,
+		Method:       http.MethodGet,
 		Function:     controllers.LoadLoginPage,
 		RequiresAuth: false,
 	},
