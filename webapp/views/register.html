@@ -7,7 +7,7 @@
 </head>
 <body>
     <h2>Create your account</h2>
-    <form action="/register" method="POST">
+    <form id="registerForm" action="/register" method="POST" autocomplete="off">
         <label for="name">Name:</label><br>
         <input type="text" id="name" name="name" required><br><br>
 
@@ -21,10 +21,14 @@
         <input type="password" id="password" name="password" required><br><br>
         
         <label for="confirm_password">Confirm Password:</label><br>
-        <input type="password" id="confirm_password" name="confirm_password" required><br><br>
-        
+        <input type="password" id="confirm_password" name="confirm_password" required><br>
+        <span id="passwordError" style="color:red; display:none;">Passwords do not match!</span><br>
+
         <button type="submit">Register</button>
     </form>
     <p>Already have an account? <a href="/login">Login here</a>.</p>
+
+    <script src="/assets/js/jquery.min.js"></script>
+    <script src="/assets/js/register.js"></script>
 </body>
 </html>
