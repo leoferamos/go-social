@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"webapp/src/responses"
 )
 
 // CreateUser handles user registration.
@@ -20,9 +21,18 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	response, err := http.Post("http://localhost:8080/users", "application/json", bytes.NewBuffer(user))
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	defer response.Body.Close()
+
+	if response.StatusCode >= 400 {
+		responses.HandleStatusCode(w, response)
+		return
+	}
+
+	responses.JSON(w, response.StatusCode, nil)
 }
