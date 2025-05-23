@@ -115,7 +115,7 @@ func (repository *users) DeleteUser(ID uint64) error {
 // GetUserByUsername retrieves a user from the database by username
 func (repository *users) GetUserByUsername(username string) (models.User, error) {
 	rows, err := repository.db.Query(
-		"SELECT id, name, username, email, created_at FROM users WHERE username = ?",
+		"SELECT id, name, username, email, password, created_at FROM users WHERE username = ?",
 		username,
 	)
 	if err != nil {
@@ -124,7 +124,7 @@ func (repository *users) GetUserByUsername(username string) (models.User, error)
 	defer rows.Close()
 	var user models.User
 	if rows.Next() {
-		if err := rows.Scan(&user.ID, &user.Name, &user.Username, &user.Email, &user.CreatedAt); err != nil {
+		if err := rows.Scan(&user.ID, &user.Name, &user.Username, &user.Email, &user.Password, &user.CreatedAt); err != nil {
 			return models.User{}, err
 		}
 	}
@@ -134,7 +134,7 @@ func (repository *users) GetUserByUsername(username string) (models.User, error)
 // GetUserByEmail retrieves a user from the database by email and return the id and hashed password
 func (repository *users) GetUserByEmail(email string) (models.User, error) {
 	rows, err := repository.db.Query(
-		"SELECT id, password FROM users WHERE email = ?",
+		"SELECT id, name, username, email, password, created_at FROM users WHERE email = ?",
 		email,
 	)
 	if err != nil {
@@ -145,7 +145,7 @@ func (repository *users) GetUserByEmail(email string) (models.User, error) {
 	var user models.User
 
 	if rows.Next() {
-		if err := rows.Scan(&user.ID, &user.Password); err != nil {
+		if err := rows.Scan(&user.ID, &user.Name, &user.Username, &user.Email, &user.Password, &user.CreatedAt); err != nil {
 			return models.User{}, err
 		}
 	}
