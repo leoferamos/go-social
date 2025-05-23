@@ -112,6 +112,25 @@ func (repository *users) DeleteUser(ID uint64) error {
 	return nil
 }
 
+// GetUserByUsername retrieves a user from the database by username
+func (repository *users) GetUserByUsername(username string) (models.User, error) {
+	rows, err := repository.db.Query(
+		"SELECT id, name, username, email, created_at FROM users WHERE username = ?",
+		username,
+	)
+	if err != nil {
+		return models.User{}, err
+	}
+	defer rows.Close()
+	var user models.User
+	if rows.Next() {
+		if err := rows.Scan(&user.ID, &user.Name, &user.Username, &user.Email, &user.CreatedAt); err != nil {
+			return models.User{}, err
+		}
+	}
+	return user, nil
+}
+
 // GetUserByEmail retrieves a user from the database by email and return the id and hashed password
 func (repository *users) GetUserByEmail(email string) (models.User, error) {
 	rows, err := repository.db.Query(
@@ -132,6 +151,8 @@ func (repository *users) GetUserByEmail(email string) (models.User, error) {
 	}
 	return user, nil
 }
+
+//
 
 // FollowUser allows a user to follow another user
 func (repository *users) FollowUser(userID, followerID uint64) error {
