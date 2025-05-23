@@ -57,5 +57,5 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		responses.JSONError(w, http.StatusInternalServerError, errors.New("error generating token"))
 		return
 	}
-	w.Write([]byte(token))
+	responses.JSON(w, http.StatusOK, models.AuthData{ID: userFromDB.ID, Token: token})
 }
