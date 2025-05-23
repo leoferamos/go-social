@@ -11,6 +11,7 @@ import (
 	"go_social/internal/security"
 	"io"
 	"net/http"
+	"strings"
 )
 
 // Login handles user login requests.
@@ -21,8 +22,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var user models.User
-	if err = json.Unmarshal(bodyRequest, &user); err != nil {
+	var loginReq models.LoginRequest
+	if err = json.Unmarshal(bodyRequest, &loginReq); err != nil {
 		responses.JSONError(w, http.StatusBadRequest, err)
 		return
 	}
@@ -35,12 +36,18 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	repository := repositories.NewUsersRepository(db)
-	userFromDB, err := repository.GetUserByEmail(user.Email)
+
+	var userFromDB models.User
+	if strings.Contains(loginReq.Identifier, "@") {
+		userFromDB, err = repository.GetUserByEmail(loginReq.Identifier)
+	} else {
+		userFromDB, err = repository.GetUserByUsername(loginReq.Identifier)
+	}
 	if err != nil {
-		responses.JSONError(w, http.StatusInternalServerError, errors.New("error fetching user"))
+		responses.JSONError(w, http.StatusUnauthorized, errors.New("invalid credentials"))
 		return
 	}
-	if err = security.CheckPasswordHash(userFromDB.Password, user.Password); err != nil {
+	if err = security.CheckPasswordHash(userFromDB.Password, loginReq.Password); err != nil {
 		responses.JSONError(w, http.StatusUnauthorized, errors.New("invalid credentials"))
 		return
 	}
