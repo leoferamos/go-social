@@ -1,36 +1,41 @@
 $(function() {
     $("#registerForm").on("submit", function(e) {
+        e.preventDefault();
+
         var password = $("#password").val();
         var confirmPassword = $("#confirm_password").val();
 
         if (password !== confirmPassword) {
             $("#passwordError").show();
             $("#confirm_password").focus();
-            e.preventDefault();
+            return;
         } else {
             $("#passwordError").hide();
         }
-    });
 
-
-    $("#confirm_password, #password").on("input", function() {
-        $("#passwordError").hide();
-    });
-
-    $.ajax({
-        url: "register",
-        method: "POST",
-        data: {
+        var userData = {
             name: $("#name").val(),
             username: $("#username").val(),
             email: $("#email").val(),
             password: $("#password").val()
-        },
-        success: function(response) {
-            // Handle successful registration
-        },
-        error: function(xhr, status, error) {
-            // Handle registration error
-        }
+        };
+
+        $.ajax({
+            url: "/register",
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(userData),
+            success: function(response) {
+                alert("Registration successful!");
+                window.location.href = "/login";
+            },
+            error: function(xhr) {
+                alert("Registration failed: " + xhr.responseText);
+            }
+        });
+    });
+
+    $("#confirm_password, #password").on("input", function() {
+        $("#passwordError").hide();
     });
 });
