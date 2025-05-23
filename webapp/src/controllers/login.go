@@ -16,12 +16,12 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		"password": r.FormValue("password"),
 	})
 	if err != nil {
-		responses.JSON(w, http.StatusBadRequest, map[string]string{"error": "Invalid user data"})
+		responses.JSON(w, http.StatusBadRequest, responses.ErrorAPI{Error: err.Error()})
 		return
 	}
 	response, err := http.Post("http://localhost:8080/login", "application/json", bytes.NewBuffer(user))
 	if err != nil {
-		responses.JSON(w, http.StatusInternalServerError, map[string]string{"error": "Failed to create user"})
+		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: err.Error()})
 		return
 	}
 
