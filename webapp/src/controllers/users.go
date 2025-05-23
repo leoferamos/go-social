@@ -21,7 +21,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		responses.JSON(w, http.StatusBadRequest, map[string]string{"error": "Invalid user data"})
 		return
 	}
-	response, err := http.Post("http://localhost:8080/users", "application/json", bytes.NewBuffer(user))
+	response, err := http.Post("http://localhost:5000/users", "application/json", bytes.NewBuffer(user))
 	if err != nil {
 		responses.JSON(w, http.StatusInternalServerError, map[string]string{"error": "Failed to create user"})
 		return
