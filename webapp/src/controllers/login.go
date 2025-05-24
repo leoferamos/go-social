@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
-	"webapp/models"
+	"webapp/src/models"
 	"webapp/src/responses"
 )
 
@@ -42,7 +42,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	var authData models.AuthData
 	if err := json.NewDecoder(response.Body).Decode(&authData); err != nil {
-		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: err.Error()})
+		responses.JSON(w, http.StatusUnprocessableEntity, responses.ErrorAPI{Error: err.Error()})
 		return
 	}
+
 }
