@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
+	"webapp/src/cookies"
 	"webapp/src/models"
 	"webapp/src/responses"
 )
@@ -45,5 +46,11 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		responses.JSON(w, http.StatusUnprocessableEntity, responses.ErrorAPI{Error: err.Error()})
 		return
 	}
+
+	if err := cookies.Save(w, authData.ID, authData.Token); err != nil {
+		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: err.Error()})
+		return
+	}
+	responses.JSON(w, http.StatusOK, authData)
 
 }
