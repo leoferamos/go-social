@@ -31,6 +31,7 @@ services:
       DB_HOST: ${DB_HOST}
       API_PORT: ${API_PORT}
       SECRET_KEY: ${SECRET_KEY}
+      ENV: production
     ports:
       - "5000:5000"
     restart: always
@@ -47,6 +48,20 @@ services:
     ports:
       - "8080:8080"
     restart: always
+
+  migrate:
+    image: migrate/migrate
+    volumes:
+      - ./migrations:/migrations
+    env_file:
+      - .env
+    command: [
+      "-path", "/migrations",
+      "-database", "mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(db:3306)/${MYSQL_DATABASE}",
+      "up"
+    ]
+    depends_on:
+      - db
 
 volumes:
   db_data:

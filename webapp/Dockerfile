@@ -9,12 +9,13 @@ COPY . .
 
 RUN go build -o webapp
 
-# Final image
 FROM alpine:latest
 
 WORKDIR /app
 
 COPY --from=builder /app/webapp .
+COPY --from=builder /app/views ./views
+COPY --from=builder /app/assets ./assets
 
 EXPOSE 8080
 
