@@ -2,11 +2,8 @@ package config
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strconv"
-
-	"github.com/joho/godotenv"
 )
 
 var (
@@ -21,18 +18,17 @@ var (
 
 // Package config provides configuration settings for the application.
 func Init() {
-	var err error
+	portStr := os.Getenv("API_PORT")
+	if portStr == "" {
+		portStr = "5000"
+	}
+	Port, _ = strconv.Atoi(portStr)
 
-	if err = godotenv.Load(".env"); err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
-	}
-	Port, err = strconv.Atoi(os.Getenv("API_PORT"))
-	if err != nil {
-		Port = 5000 // Default port
-	}
-	DatabaseStringConection = fmt.Sprintf("%s:%s@/%s?charset=utf8&parseTime=True&loc=Local",
+	DatabaseStringConection = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
 		os.Getenv("DB_USER"),
 		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_PORT"),
 		os.Getenv("DB_NAME"),
 	)
 	SecretKey = []byte(os.Getenv("SECRET_KEY"))

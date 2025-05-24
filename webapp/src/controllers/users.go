@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"os"
 	"webapp/src/responses"
 )
 
@@ -19,7 +20,13 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		responses.JSON(w, http.StatusBadRequest, map[string]string{"error": "Invalid user data"})
 		return
 	}
-	response, err := http.Post("http://localhost:5000/users", "application/json", bytes.NewBuffer(userJSON))
+
+	apiURL := os.Getenv("API_URL")
+	if apiURL == "" {
+		apiURL = "http://api:5000"
+	}
+
+	response, err := http.Post(apiURL+"/users", "application/json", bytes.NewBuffer(userJSON))
 	if err != nil {
 		responses.JSON(w, http.StatusInternalServerError, map[string]string{"error": "Failed to create user"})
 		return

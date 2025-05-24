@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"os"
 	"webapp/models"
 	"webapp/src/responses"
 )
@@ -20,7 +21,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		responses.JSON(w, http.StatusBadRequest, responses.ErrorAPI{Error: err.Error()})
 		return
 	}
-	response, err := http.Post("http://localhost:5000/login", "application/json", bytes.NewBuffer(user))
+
+	apiURL := os.Getenv("API_URL")
+	if apiURL == "" {
+		apiURL = "http://api:5000"
+	}
+
+	response, err := http.Post(apiURL+"/login", "application/json", bytes.NewBuffer(user))
 	if err != nil {
 		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: err.Error()})
 		return
