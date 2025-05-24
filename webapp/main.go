@@ -6,12 +6,14 @@ import (
 	"net/http"
 	"os"
 	"webapp/src/config"
+	"webapp/src/cookies"
 	"webapp/src/routes"
 	"webapp/src/utils"
 )
 
 func main() {
 	config.Load()
+	cookies.Load()
 	fmt.Print("Running web application...")
 	utils.LoadTemplates()
 
