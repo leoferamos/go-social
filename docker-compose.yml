@@ -48,6 +48,8 @@ services:
     ports:
       - "8080:8080"
     restart: always
+    volumes:
+      - .env:/app/.env
 
   migrate:
     image: migrate/migrate
