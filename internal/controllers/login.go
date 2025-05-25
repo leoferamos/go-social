@@ -11,6 +11,7 @@ import (
 	"go_social/internal/security"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -57,5 +58,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		responses.JSONError(w, http.StatusInternalServerError, errors.New("error generating token"))
 		return
 	}
-	responses.JSON(w, http.StatusOK, models.AuthData{ID: userFromDB.ID, Token: token})
+	userID := strconv.FormatUint(userFromDB.ID, 10)
+	responses.JSON(w, http.StatusOK, models.AuthData{ID: userID, Token: token})
 }
