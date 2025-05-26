@@ -19,3 +19,8 @@ func LoadUsersPage(w http.ResponseWriter, r *http.Request) {
 func LoadRegisterPage(w http.ResponseWriter, r *http.Request) {
 	utils.ExecuteTemplate(w, "register.html", nil)
 }
+
+// LoadFeedPage handles the feed page request.
+func LoadFeedPage(w http.ResponseWriter, r *http.Request) {
+	utils.ExecuteTemplate(w, "feed.html", nil)
+}
