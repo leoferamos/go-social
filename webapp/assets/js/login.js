@@ -4,12 +4,13 @@ $('#login').on('submit', function(event) {
     $.ajax({
         url: '/login',
         method: 'POST',
-        data: {
+        contentType: 'application/json',
+        data: JSON.stringify({
             identifier: $('#identifier').val(),
             password: $('#password').val()
-        }
+        })
     }).done(function() {
-        window.location.href = '/home';
+        window.location.href = '/feed';
     }).fail(function(xhr) {
         alert('Login failed: ' + xhr.responseText);
     });
