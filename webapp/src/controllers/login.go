@@ -14,10 +14,12 @@ import (
 func Login(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
-	user, err := json.Marshal(map[string]string{
-		"identifier": r.FormValue("identifier"),
-		"password":   r.FormValue("password"),
-	})
+	var creds map[string]string
+	if err := json.NewDecoder(r.Body).Decode(&creds); err != nil {
+		responses.JSON(w, http.StatusBadRequest, responses.ErrorAPI{Error: "Invalid credentials"})
+		return
+	}
+	user, err := json.Marshal(creds)
 	if err != nil {
 		responses.JSON(w, http.StatusBadRequest, responses.ErrorAPI{Error: err.Error()})
 		return
