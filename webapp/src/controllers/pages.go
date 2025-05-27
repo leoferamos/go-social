@@ -1,7 +1,13 @@
 package controllers
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
+	"os"
+	"webapp/src/models"
+	"webapp/src/requests"
+	"webapp/src/responses"
 	"webapp/src/utils"
 )
 
@@ -22,5 +28,28 @@ func LoadRegisterPage(w http.ResponseWriter, r *http.Request) {
 
 // LoadFeedPage handles the feed page request.
 func LoadFeedPage(w http.ResponseWriter, r *http.Request) {
-	utils.ExecuteTemplate(w, "feed.html", nil)
+	apiURL := os.Getenv("API_URL")
+	if apiURL == "" {
+		apiURL = "http://api:5000"
+	}
+	apiURL = fmt.Sprintf("%s/feed", apiURL)
+
+	response, err := requests.MakeAuthenticatedRequest(r, http.MethodGet, apiURL, nil)
+	if err != nil {
+		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: err.Error()})
+		return
+	}
+	defer response.Body.Close()
+	if response.StatusCode >= 400 {
+		responses.HandleStatusCode(w, response)
+		return
+	}
+	var posts []models.Posts
+	if err := json.NewDecoder(response.Body).Decode(&posts); err != nil {
+		responses.JSON(w, http.StatusUnprocessableEntity, responses.ErrorAPI{Error: err.Error()})
+		return
+	}
+
+	utils.ExecuteTemplate(w, "feed.html", posts)
+
 }
