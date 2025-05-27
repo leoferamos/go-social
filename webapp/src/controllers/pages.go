@@ -32,7 +32,7 @@ func LoadFeedPage(w http.ResponseWriter, r *http.Request) {
 	if apiURL == "" {
 		apiURL = "http://api:5000"
 	}
-	apiURL = fmt.Sprintf("%s/feed", apiURL)
+	apiURL = fmt.Sprintf("%s/posts", apiURL)
 
 	response, err := requests.MakeAuthenticatedRequest(r, http.MethodGet, apiURL, nil)
 	if err != nil {
