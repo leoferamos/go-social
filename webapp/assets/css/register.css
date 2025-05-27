@@ -1,69 +1,109 @@
-body {
-    font-family: Arial, sans-serif;
-    background: #f5f6fa;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+/* register.css */
+html, body {
+    height: 100%;
     margin: 0;
     padding: 0;
 }
 
-h2 {
-    margin-top: 40px;
-    color: #2d3436;
+body {
+    background-color: #15202B;
+    color: #E7E9EA;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
 }
 
-form {
-    background: #fff;
-    padding: 32px 24px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    margin-top: 24px;
-    min-width: 320px;
+.signup-container {
+    background-color: #1E2732;
+    padding: 1.5rem 2rem;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 480px;
+    border: 1px solid #38444D;
+    box-shadow: 0px 8px 28px rgba(0,0,0,0.25);
+    margin: 20px;
+    max-height: calc(100vh - 40px);
 }
 
-label {
+.signup-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.signup-header h1 {
+    color: #E7E9EA;
     font-weight: bold;
-    color: #636e72;
+    font-size: 1.6rem;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="password"] {
+.form-control-custom {
+    background-color: #2C3640;
+    border: 1px solid #38444D;
+    color: #E7E9EA;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+}
+
+.form-control-custom::placeholder {
+    color: #71767B;
+}
+
+.form-control-custom:focus {
+    background-color: #2C3640;
+    color: #E7E9EA;
+    border-color: #1D9BF0;
+    box-shadow: 0 0 0 0.2rem rgba(29, 155, 240, 0.25);
+}
+
+.btn-signup {
+    background-color: #1D9BF0;
+    border-color: #1D9BF0;
+    color: white;
+    font-weight: bold;
+    border-radius: 9999px;
+    padding: 0.7rem 1.5rem;
     width: 100%;
-    padding: 8px 10px;
-    margin: 6px 0 16px 0;
-    border: 1px solid #b2bec3;
-    border-radius: 4px;
-    box-sizing: border-box;
+    font-size: 0.95rem;
+    margin-top: 1rem;
 }
 
-button[type="submit"] {
-    background: #0984e3;
-    color: #fff;
-    border: none;
-    padding: 10px 0;
-    width: 100%;
-    border-radius: 4px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background 0.2s;
+.btn-signup:hover,
+.btn-signup:focus {
+    background-color: #1A8CD8;
+    border-color: #1A8CD8;
+    color: white;
 }
 
-button[type="submit"]:hover {
-    background: #74b9ff;
+.signup-footer {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.85rem;
 }
 
-p {
-    margin-top: 18px;
-    color: #636e72;
-}
-
-a {
-    color: #0984e3;
+.signup-footer a {
+    color: #1D9BF0;
     text-decoration: none;
 }
 
-a:hover {
+.signup-footer a:hover {
     text-decoration: underline;
+}
+
+.form-label-custom {
+    margin-bottom: 0.4rem;
+    font-weight: 500;
+    color: #B0B3B8;
+    font-size: 0.9rem;
+}
+
+.form-text-custom {
+    font-size: 0.75rem;
+    color: #71767B;
+}
+
+.mb-3 {
+    margin-bottom: 0.8rem !important;
 }
