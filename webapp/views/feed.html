@@ -2,38 +2,94 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Feed</title>
-    <!-- Link to CSS will be added later -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoSocial Feed</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/assets/css/feed.css">
 </head>
 <body>
-    <header>
-        <h1>Social Feed</h1>
-        <nav>
-            <a href="/profile">Profile</a>
-            <a href="/logout">Logout</a>
-        </nav>
-    </header>
-    <main>
-        <section id="create-post">
-            <form method="post" action="/posts/create">
-                <textarea name="content" placeholder="What's on your mind?" required></textarea>
-                <button type="submit">Post</button>
-            </form>
-        </section>
-        <section id="feed-list">
-            <!-- Posts will be rendered here -->
-            {{ range . }}
-            <article class="post">
-                <header>
-                    <strong>{{ .AuthorUsername }}</strong>
-                    <span>{{ .CreatedAt }}</span>
-                </header>
-                <h2>{{ .Title }}</h2>
-                <p>{{ .Content }}</p>
-                <small>Likes: {{ .Likes }}</small>
-            </article>
-            {{ end }}
-        </section>
-    </main>
+    <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold navbar-brand-custom" href="/feed">GoSocial</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" style="border-color: #38444D;">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom active" aria-current="page" href="/feed">Feed</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="/profile">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid p-0">
+        <div class="row justify-content-center gx-0">
+            <div class="col-12 col-md-10 col-lg-6 main-column-border">
+                <form method="post" action="/posts/create" class="create-post-container">
+                    <div class="d-flex">
+                        <div class="profile-pic-placeholder" style="width:40px; height:40px;"></div>
+                        <textarea class="form-control create-post-textarea" name="content" rows="2" placeholder="What's happening?" required></textarea>
+                    </div>
+                    <div class="create-post-actions">
+                        <div class="create-post-icons">
+                            <span><i class="bi bi-image"></i></span>
+                            <span><i class="bi bi-filetype-gif"></i></span>
+                            <span><i class="bi bi-bar-chart-line"></i></span>
+                            <span><i class="bi bi-emoji-smile"></i></span>
+                            <span><i class="bi bi-calendar-event"></i></span>
+                            <span><i class="bi bi-geo-alt"></i></span>
+                        </div>
+                        <button type="submit" class="btn btn-post">Post</button>
+                    </div>
+                </form>
+                <section id="feed-posts">
+                    {{ range . }}
+                    <article class="feed-post">
+                        <div class="profile-pic-placeholder"></div>
+                        <div class="post-content-area">
+                            <header class="post-header">
+                                <span class="post-author-name">{{ .AuthorUsername }}</span>
+                                <span class="post-author-username">@{{ .AuthorUsername }}</span>
+                                <span class="post-time">· {{ .CreatedAt }}</span>
+                            </header>
+                            {{ if .Title }}
+                            <h5 class="post-title mt-1 mb-2">{{ .Title }}</h5>
+                            {{ end }}
+                            <p class="post-text">{{ .Content }}</p>
+                            <footer class="post-actions">
+                                <div><i class="bi bi-chat"></i> <span>{{ .ReplyCount }}</span></div>
+                                <div><i class="bi bi-arrow-repeat"></i> <span>{{ .RepostCount }}</span></div>
+                                <div><i class="bi bi-heart"></i> <span>{{ .Likes }}</span></div>
+                                <div><i class="bi bi-bar-chart"></i> <span>{{ .ViewCount }}</span></div>
+                                <div><i class="bi bi-upload"></i></div>
+                            </footer>
+                        </div>
+                    </article>
+                    {{ else }}
+                    <div class="no-posts-message">
+                        <p class="mb-0">No posts yet. Be the first to share something!</p>
+                    </div>
+                    {{ end }}
+                </section>
+                <div id="loading-indicator" class="text-center my-4" style="display: none;">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading more posts...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

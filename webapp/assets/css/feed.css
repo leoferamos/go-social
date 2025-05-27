@@ -1,0 +1,166 @@
+body {
+    background-color: #15202B;
+    color: #E7E9EA;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+.navbar-custom {
+    background-color: #15202B;
+    border-bottom: 1px solid #38444D;
+}
+.navbar-brand-custom {
+    color: #D9D9D9 !important;
+}
+.nav-link-custom {
+    color: #D9D9D9 !important;
+}
+.nav-link-custom.active {
+    color: #1D9BF0 !important;
+    font-weight: bold;
+}
+.create-post-container {
+    padding: 1rem;
+    border-bottom: 1px solid #38444D;
+}
+.create-post-textarea {
+    background-color: transparent;
+    color: #E7E9EA;
+    border: none;
+    resize: none;
+    font-size: 1.25rem;
+    padding-left: 0;
+    padding-right: 0;
+}
+.create-post-textarea::placeholder {
+    color: #71767B;
+}
+.create-post-textarea:focus {
+    background-color: transparent;
+    color: #E7E9EA;
+    border: none;
+    box-shadow: none;
+}
+.create-post-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.75rem;
+}
+.create-post-icons span {
+    color: #1D9BF0;
+    margin-right: 1rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+.btn-post {
+    background-color: #1D9BF0;
+    border-color: #1D9BF0;
+    color: white;
+    font-weight: bold;
+    border-radius: 9999px;
+    padding: 0.5rem 1rem;
+}
+.btn-post:hover {
+    background-color: #1A8CD8;
+    border-color: #1A8CD8;
+}
+.feed-post {
+    display: flex;
+    padding: 1rem;
+    border-bottom: 1px solid #38444D;
+    transition: background-color 0.2s ease-in-out;
+}
+.feed-post:hover {
+    background-color: #1C2733;
+}
+.profile-pic-placeholder {
+    width: 48px;
+    height: 48px;
+    background-color: #38444D;
+    border-radius: 50%;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+.post-content-area {
+    flex-grow: 1;
+}
+.post-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+.post-author-name {
+    font-weight: bold;
+    color: #E7E9EA;
+}
+.post-author-username, .post-time {
+    color: #71767B;
+    margin-left: 0.25rem;
+    font-size: 0.9rem;
+}
+.post-text {
+    color: #E7E9EA;
+    margin-bottom: 0.75rem;
+    white-space: pre-wrap;
+}
+.post-actions {
+    display: flex;
+    justify-content: space-around;
+    color: #71767B;
+}
+.post-actions div {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem;
+}
+.post-actions div:hover i, .post-actions div:hover span {
+    color: #1D9BF0;
+}
+.post-actions i {
+    font-size: 1.1rem;
+    margin-right: 0.3rem;
+}
+.main-column-border {
+    border-left: 1px solid #38444D;
+    border-right: 1px solid #38444D;
+    min-height: 100vh;
+}
+.no-posts-message {
+    color: #71767B;
+    padding: 2rem;
+    text-align: center;
+}
+#loading-indicator .spinner-border {
+    color: #1D9BF0;
+}
+.post-box {
+    background: #222;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    color: #fff;
+}
+.post-box textarea {
+    background: transparent;
+    border: none;
+    color: #fff;
+    resize: none;
+    width: 100%;
+    min-height: 60px;
+    font-size: 1.2rem;
+}
+.post-box textarea:focus {
+    outline: none;
+    box-shadow: none;
+}
+.post-btn {
+    float: right;
+    margin-top: 0.5rem;
+}
+@media (max-width: 576px) {
+    .create-post-container,
+    .feed-post,
+    .post-box {
+        padding: 1rem;
+    }
+}
