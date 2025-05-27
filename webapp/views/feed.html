@@ -22,13 +22,15 @@
         </section>
         <section id="feed-list">
             <!-- Posts will be rendered here -->
-            {{ range .Posts }}
+            {{ range . }}
             <article class="post">
                 <header>
-                    <strong>{{ .Author }}</strong>
+                    <strong>{{ .AuthorUsername }}</strong>
                     <span>{{ .CreatedAt }}</span>
                 </header>
+                <h2>{{ .Title }}</h2>
                 <p>{{ .Content }}</p>
+                <small>Likes: {{ .Likes }}</small>
             </article>
             {{ end }}
         </section>
