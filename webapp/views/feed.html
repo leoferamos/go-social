@@ -60,18 +60,14 @@
                             <header class="post-header">
                                 <span class="post-author-name">{{ .AuthorUsername }}</span>
                                 <span class="post-author-username">@{{ .AuthorUsername }}</span>
-                                <span class="post-time">· {{ .CreatedAt }}</span>
+                                <span class="post-time" data-time="{{ .CreatedAt }}" title=""></span>
                             </header>
                             {{ if .Title }}
                             <h5 class="post-title mt-1 mb-2">{{ .Title }}</h5>
                             {{ end }}
                             <p class="post-text">{{ .Content }}</p>
                             <footer class="post-actions">
-                                <div><i class="bi bi-chat"></i> <span>{{ .ReplyCount }}</span></div>
-                                <div><i class="bi bi-arrow-repeat"></i> <span>{{ .RepostCount }}</span></div>
                                 <div><i class="bi bi-heart"></i> <span>{{ .Likes }}</span></div>
-                                <div><i class="bi bi-bar-chart"></i> <span>{{ .ViewCount }}</span></div>
-                                <div><i class="bi bi-upload"></i></div>
                             </footer>
                         </div>
                     </article>
@@ -91,5 +87,42 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    function formatRelativeDate(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffSec = Math.floor(diffMs / 1000);
+        const diffMin = Math.floor(diffSec / 60);
+        const diffHour = Math.floor(diffMin / 60);
+        const diffDay = Math.floor(diffHour / 24);
+
+        if (diffSec < 60) return 'now';
+        if (diffMin < 60) return `${diffMin} min`;
+        if (diffHour < 24) return `${diffHour} h`;
+        if (diffDay < 7) return `${diffDay} d`;
+        return date.toLocaleDateString('en-US', { day: '2-digit', month: 'short' });
+    }
+
+    function formatFullDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
+    }
+
+    document.querySelectorAll('.post-time').forEach(function(span) {
+        const iso = span.getAttribute('data-time');
+        if (iso) {
+            span.textContent = formatRelativeDate(iso);
+            span.title = formatFullDate(iso);
+        }
+    });
+    </script>
 </body>
 </html>
