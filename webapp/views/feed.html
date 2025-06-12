@@ -62,9 +62,6 @@
                                 <span class="post-author-username">@{{ .AuthorUsername }}</span>
                                 <span class="post-time" data-time="{{ .CreatedAt }}" title=""></span>
                             </header>
-                            {{ if .Title }}
-                            <h5 class="post-title mt-1 mb-2">{{ .Title }}</h5>
-                            {{ end }}
                             <p class="post-text">{{ .Content }}</p>
                             <footer class="post-actions">
                                 <div><i class="bi bi-heart"></i> <span>{{ .Likes }}</span></div>
