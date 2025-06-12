@@ -20,6 +20,7 @@ func Configure(r *mux.Router) *mux.Router {
 	routes := loginRoute
 	routes = append(routes, userRoutes...)
 	routes = append(routes, feedRoute...)
+	routes = append(routes, postsRoute...)
 
 	for _, route := range routes {
 
