@@ -18,13 +18,13 @@ func NewPostsRepository(db *sql.DB) *Posts {
 // CreatePost creates a new post in the database.
 func (r Posts) CreatePost(post models.Posts) (uint64, error) {
 	statement, err := r.db.Prepare(
-		"INSERT INTO posts (title, content, author_id) VALUES (?, ?, ?)",
+		"INSERT INTO posts (content, author_id) VALUES (?, ?)",
 	)
 	if err != nil {
 		return 0, err
 	}
 	defer statement.Close()
-	result, err := statement.Exec(post.Title, post.Content, post.AuthorID)
+	result, err := statement.Exec(post.Content, post.AuthorID)
 	if err != nil {
 		return 0, err
 	}
@@ -38,13 +38,13 @@ func (r Posts) CreatePost(post models.Posts) (uint64, error) {
 // GetPost retrieves a post by its ID from the database.
 func (r Posts) GetPostByID(id uint64) (models.Posts, error) {
 	rows, err := r.db.Query(
-		`SELECT p.id, p.title, p.content, p.author_id, u.username,
+		`SELECT p.id, p.content, p.author_id, u.username,
             COUNT(pl.user_id) AS likes, p.created_at
         FROM posts p
         INNER JOIN users u ON u.id = p.author_id
         LEFT JOIN post_likes pl ON pl.post_id = p.id
         WHERE p.id = ?
-        GROUP BY p.id, p.title, p.content, p.author_id, u.username, p.created_at`,
+        GROUP BY p.id, p.content, p.author_id, u.username, p.created_at`,
 		id,
 	)
 	if err != nil {
@@ -55,7 +55,6 @@ func (r Posts) GetPostByID(id uint64) (models.Posts, error) {
 	if rows.Next() {
 		if err = rows.Scan(
 			&post.ID,
-			&post.Title,
 			&post.Content,
 			&post.AuthorID,
 			&post.AuthorUsername,
@@ -71,14 +70,14 @@ func (r Posts) GetPostByID(id uint64) (models.Posts, error) {
 // GetPosts Gets the posts of people the user follows and their own posts.
 func (r Posts) GetPosts(userID uint64) ([]models.Posts, error) {
 	rows, err := r.db.Query(
-		`SELECT p.id, p.title, p.content, p.author_id, u.username,
+		`SELECT p.id, p.content, p.author_id, u.username,
             COUNT(pl.user_id) AS likes, p.created_at
         FROM posts p
         INNER JOIN users u ON u.id = p.author_id
         LEFT JOIN followers f ON f.user_id = p.author_id AND f.follower_id = ?
         LEFT JOIN post_likes pl ON pl.post_id = p.id
         WHERE f.follower_id IS NOT NULL OR p.author_id = ?
-        GROUP BY p.id, p.title, p.content, p.author_id, u.username, p.created_at
+        GROUP BY p.id, p.content, p.author_id, u.username, p.created_at
         ORDER BY p.created_at DESC`,
 		userID, userID,
 	)
@@ -91,7 +90,6 @@ func (r Posts) GetPosts(userID uint64) ([]models.Posts, error) {
 		var post models.Posts
 		if err = rows.Scan(
 			&post.ID,
-			&post.Title,
 			&post.Content,
 			&post.AuthorID,
 			&post.AuthorUsername,
@@ -108,13 +106,13 @@ func (r Posts) GetPosts(userID uint64) ([]models.Posts, error) {
 // UpdatePost updates a post in the database.
 func (r Posts) UpdatePost(postID uint64, post models.Posts) error {
 	statement, err := r.db.Prepare(
-		"UPDATE posts SET title = ?, content = ? WHERE id = ?",
+		"UPDATE posts SET content = ? WHERE id = ?",
 	)
 	if err != nil {
 		return err
 	}
 	defer statement.Close()
-	if _, err := statement.Exec(post.Title, post.Content, postID); err != nil {
+	if _, err := statement.Exec(post.Content, postID); err != nil {
 		return err
 	}
 	return nil
@@ -138,13 +136,13 @@ func (r Posts) DeletePost(postID uint64) error {
 // GetUserPosts Gets the posts of a user.
 func (r Posts) GetUserPosts(userID uint64) ([]models.Posts, error) {
 	rows, err := r.db.Query(
-		`SELECT p.id, p.title, p.content, p.author_id, u.username,
+		`SELECT p.id, p.content, p.author_id, u.username,
             COUNT(pl.user_id) AS likes, p.created_at
         FROM posts p
         INNER JOIN users u ON u.id = p.author_id
         LEFT JOIN post_likes pl ON pl.post_id = p.id
         WHERE p.author_id = ?
-        GROUP BY p.id, p.title, p.content, p.author_id, u.username, p.created_at
+        GROUP BY p.id, p.content, p.author_id, u.username, p.created_at
         ORDER BY p.created_at DESC`,
 		userID,
 	)
@@ -157,7 +155,6 @@ func (r Posts) GetUserPosts(userID uint64) ([]models.Posts, error) {
 		var post models.Posts
 		if err = rows.Scan(
 			&post.ID,
-			&post.Title,
 			&post.Content,
 			&post.AuthorID,
 			&post.AuthorUsername,
