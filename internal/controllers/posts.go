@@ -55,7 +55,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	createdPost, err := repository.GetPostByID(post.ID)
+	createdPost, err := repository.GetPostByID(post.ID, userID)
 	if err != nil {
 		responses.JSONError(w, http.StatusInternalServerError, err)
 		return
@@ -65,6 +65,11 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 
 // GetPost handles the retrieval of a post by its ID.
 func GetPost(w http.ResponseWriter, r *http.Request) {
+	userID, err := auth.ExtractUserID(r)
+	if err != nil {
+		responses.JSONError(w, http.StatusUnauthorized, err)
+		return
+	}
 	parameters := mux.Vars(r)
 	postID, err := strconv.ParseUint(parameters["id"], 10, 64)
 	if err != nil {
@@ -78,7 +83,7 @@ func GetPost(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 	repository := repositories.NewPostsRepository(db)
-	post, err := repository.GetPostByID(postID)
+	post, err := repository.GetPostByID(postID, userID)
 	if err != nil {
 		responses.JSONError(w, http.StatusInternalServerError, err)
 		return
@@ -128,7 +133,7 @@ func UpdatePost(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 	repository := repositories.NewPostsRepository(db)
-	postOnDB, err := repository.GetPostByID(postID)
+	postOnDB, err := repository.GetPostByID(postID, userID)
 	if err != nil {
 		responses.JSONError(w, http.StatusInternalServerError, err)
 		return
@@ -178,7 +183,7 @@ func DeletePost(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 	repository := repositories.NewPostsRepository(db)
-	postOnDB, err := repository.GetPostByID(postID)
+	postOnDB, err := repository.GetPostByID(postID, userID)
 	if err != nil {
 		responses.JSONError(w, http.StatusInternalServerError, err)
 		return
@@ -196,8 +201,13 @@ func DeletePost(w http.ResponseWriter, r *http.Request) {
 
 // GetUserPosts Gets the posts of a user.
 func GetUserPosts(w http.ResponseWriter, r *http.Request) {
+	userID, err := auth.ExtractUserID(r)
+	if err != nil {
+		responses.JSONError(w, http.StatusUnauthorized, err)
+		return
+	}
 	parameters := mux.Vars(r)
-	userID, err := strconv.ParseUint(parameters["id"], 10, 64)
+	targetUserID, err := strconv.ParseUint(parameters["id"], 10, 64)
 	if err != nil {
 		responses.JSONError(w, http.StatusBadRequest, err)
 		return
@@ -209,7 +219,7 @@ func GetUserPosts(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 	repository := repositories.NewPostsRepository(db)
-	posts, err := repository.GetUserPosts(userID)
+	posts, err := repository.GetUserPosts(targetUserID, userID)
 	if err != nil {
 		responses.JSONError(w, http.StatusInternalServerError, err)
 		return
