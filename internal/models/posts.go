@@ -13,6 +13,7 @@ type Posts struct {
 	AuthorUsername string    `json:"author_username,omitempty"`
 	Likes          uint64    `json:"likes"`
 	CreatedAt      time.Time `json:"created_at,omitempty"`
+	LikedByMe      bool      `json:"liked_by_me"`
 }
 
 // Prepare calls the methods to format and validate the post data.
