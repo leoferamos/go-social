@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
+	"webapp/src/cookies"
 	"webapp/src/models"
 	"webapp/src/requests"
 	"webapp/src/responses"
@@ -50,6 +52,15 @@ func LoadFeedPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.ExecuteTemplate(w, "feed.html", posts)
+	cookie, _ := cookies.Read(r)
 
+	userID, _ := strconv.ParseUint(cookie["id"], 10, 64)
+
+	utils.ExecuteTemplate(w, "feed.html", struct {
+		Posts  []models.Posts
+		UserID uint64
+	}{
+		Posts:  posts,
+		UserID: userID,
+	})
 }
