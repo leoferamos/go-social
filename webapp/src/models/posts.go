@@ -8,4 +8,5 @@ type Posts struct {
 	AuthorUsername string `json:"author_username,omitempty"`
 	Likes          uint64 `json:"likes"`
 	CreatedAt      string `json:"created_at,omitempty"`
+	LikedByMe      bool   `json:"liked_by_me"`
 }
