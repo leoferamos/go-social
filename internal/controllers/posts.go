@@ -54,7 +54,13 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		responses.JSONError(w, http.StatusInternalServerError, err)
 		return
 	}
-	responses.JSON(w, http.StatusCreated, post)
+
+	createdPost, err := repository.GetPostByID(post.ID)
+	if err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusCreated, createdPost)
 }
 
 // GetPost handles the retrieval of a post by its ID.
