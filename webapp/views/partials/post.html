@@ -7,7 +7,9 @@
 {{ end }}
 
 {{ define "post-likes" }}
-<div><i class="bi bi-heart like-post" style="cursor: pointer;"></i> <span>{{ .Likes }}</span></div>
+<div>
+    <i class="bi like-post {{ if .LikedByMe }}bi-heart-fill text-danger{{ else }}bi-heart{{ end }}" style="cursor: pointer;"></i> <span>{{ .Likes }}</span>
+</div>
 {{ end }}
 
 {{ define "post-with-permission" }}
