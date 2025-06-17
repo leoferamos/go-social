@@ -63,9 +63,13 @@
                                 <span class="post-time" data-time="{{ .CreatedAt }}"></span>
                             </header>
                             <p class="post-text">{{ .Content }}</p>
+                            {{ if (eq .AuthorID $.UserID) }}
                             <footer class="post-actions">
                                 <div><i class="bi bi-heart"></i> <span>{{ .Likes }}</span></div>
                             </footer>
+                            {{ else }}
+                            <p>oi</p>
+                            {{ end }}
                         </div>
                     </article>
                     {{ else }}
