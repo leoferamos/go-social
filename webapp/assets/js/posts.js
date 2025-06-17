@@ -84,6 +84,36 @@ $(document).ready(function() {
             }
         });
     });
+    
+    $('#feed-posts').on('click', '.delete-post-btn', function(e) {
+        e.preventDefault();
+        const $btn = $(this);
+        const postId = $btn.data('post-id');
+        if (!confirm('Are you sure you want to delete this post?')) return;
+        $.ajax({
+            url: `/posts/${postId}`,
+            method: 'DELETE',
+            success: function() {
+                $btn.closest('.feed-post').remove();
+            },
+            error: function(xhr) {
+                let msg = 'Error deleting post.';
+                if (xhr && xhr.responseText) {
+                    try {
+                        const resp = JSON.parse(xhr.responseText);
+                        if (resp && resp.error) {
+                            msg = 'Error: ' + resp.error;
+                        }
+                    } catch (e) {
+                        msg = 'HTTP ' + xhr.status + ': ' + xhr.statusText + '\n' + xhr.responseText;
+                    }
+                } else if (xhr && xhr.status) {
+                    msg = 'HTTP ' + xhr.status + ': ' + xhr.statusText;
+                }
+                alert(msg);
+            }
+        });
+    });
 
     function escapeHtml(text) {
         return text
