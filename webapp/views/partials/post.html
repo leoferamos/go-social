@@ -25,7 +25,7 @@
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li>
                         <a class="dropdown-item text-danger delete-post-btn" href="#" data-post-id="{{ .ID }}">
-                            <i class="bi bi-trash"></i> Excluir
+                            <i class="bi bi-trash"></i> Delete
                         </a>
                     </li>
                 </ul>
@@ -50,4 +50,27 @@
         </footer>
     </div>
 </article>
+{{ end }}
+
+{{ define "delete_post_modal" }}
+<div class="modal fade" id="deletePostModal" tabindex="-1" aria-labelledby="deletePostModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="background: #16181c; color: #fff; border-radius: 18px;">
+      <div class="modal-header border-0" style="justify-content: center;">
+        <h5 class="modal-title" id="deletePostModalLabel" style="font-weight: bold;">Delete post?</h5>
+      </div>
+      <div class="modal-body text-center" style="font-size: 1rem;">
+        This action cannot be undone. The post will be removed from your profile, from the timeline of all your followers, and from search results.
+      </div>
+      <div class="modal-footer border-0 d-flex flex-column gap-2">
+        <button type="button" class="btn btn-danger w-100" id="confirmDeletePostBtn" style="background: #f4212e; border: none; font-weight: bold;">
+          Delete
+        </button>
+        <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal" style="background: #222327; border: none;">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 {{ end }}
