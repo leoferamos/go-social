@@ -85,16 +85,26 @@ $(document).ready(function() {
         });
     });
     
+    let postIdToDelete = null;
+
     $('#feed-posts').on('click', '.delete-post-btn', function(e) {
         e.preventDefault();
-        const $btn = $(this);
-        const postId = $btn.data('post-id');
-        if (!confirm('Are you sure you want to delete this post?')) return;
+        postIdToDelete = $(this).data('post-id');
+        const deleteModal = new bootstrap.Modal(document.getElementById('deletePostModal'));
+        deleteModal.show();
+    });
+
+    $('#confirmDeletePostBtn').on('click', function() {
+        if (!postIdToDelete) return;
+        const $post = $(`.feed-post[data-post-id="${postIdToDelete}"]`);
         $.ajax({
-            url: `/posts/${postId}`,
+            url: `/posts/${postIdToDelete}`,
             method: 'DELETE',
             success: function() {
-                $btn.closest('.feed-post').remove();
+                $post.remove();
+                postIdToDelete = null;
+                const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deletePostModal'));
+                deleteModal.hide();
             },
             error: function(xhr) {
                 let msg = 'Error deleting post.';
