@@ -251,7 +251,12 @@ func LikePost(w http.ResponseWriter, r *http.Request) {
 		responses.JSONError(w, http.StatusInternalServerError, err)
 		return
 	}
-	responses.JSON(w, http.StatusNoContent, nil)
+	post, err := repository.GetPostByID(postID, userID)
+	if err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, post)
 }
 
 // UnlikePost Unlikes a post.
@@ -278,5 +283,10 @@ func UnlikePost(w http.ResponseWriter, r *http.Request) {
 		responses.JSONError(w, http.StatusInternalServerError, err)
 		return
 	}
-	responses.JSON(w, http.StatusNoContent, nil)
+	post, err := repository.GetPostByID(postID, userID)
+	if err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, post)
 }
