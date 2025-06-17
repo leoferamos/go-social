@@ -128,3 +128,33 @@ func UnlikePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+// DeletePost calls the API to delete a post.
+func DeletePost(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	postID := vars["id"]
+	if postID == "" {
+		responses.JSON(w, http.StatusBadRequest, responses.ErrorAPI{Error: "Post ID is required"})
+		return
+	}
+
+	apiURL := os.Getenv("API_URL")
+	if apiURL == "" {
+		apiURL = "http://api:5000"
+	}
+	apiURL = fmt.Sprintf("%s/posts/%s", apiURL, postID)
+
+	response, err := requests.MakeAuthenticatedRequest(r, http.MethodDelete, apiURL, nil)
+	if err != nil {
+		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: err.Error()})
+		return
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode >= 400 {
+		responses.HandleStatusCode(w, response)
+		return
+	}
+
+	w.WriteHeader(response.StatusCode)
+}
