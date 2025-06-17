@@ -46,7 +46,7 @@ func LoadFeedPage(w http.ResponseWriter, r *http.Request) {
 		responses.HandleStatusCode(w, response)
 		return
 	}
-	var posts []models.Posts
+	var posts []models.Post
 	if err := json.NewDecoder(response.Body).Decode(&posts); err != nil {
 		responses.JSON(w, http.StatusUnprocessableEntity, responses.ErrorAPI{Error: err.Error()})
 		return
@@ -57,7 +57,7 @@ func LoadFeedPage(w http.ResponseWriter, r *http.Request) {
 	userID, _ := strconv.ParseUint(cookie["id"], 10, 64)
 
 	utils.ExecuteTemplate(w, "feed.html", struct {
-		Posts  []models.Posts
+		Posts  []models.Post
 		UserID uint64
 	}{
 		Posts:  posts,
