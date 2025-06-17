@@ -54,24 +54,11 @@
                 </form>
                 <section id="feed-posts">
                     {{ range .Posts }}
-                    <article class="feed-post">
-                        <div class="profile-pic-placeholder"></div>
-                        <div class="post-content-area">
-                            <header class="post-header">
-                                <span class="post-author-name">{{ .AuthorUsername }}</span>
-                                <span class="post-author-username">@{{ .AuthorUsername }}</span>
-                                <span class="post-time" data-time="{{ .CreatedAt }}"></span>
-                            </header>
-                            <p class="post-text">{{ .Content }}</p>
-                            {{ if (eq .AuthorID $.UserID) }}
-                            <footer class="post-actions">
-                                <div><i class="bi bi-heart"></i> <span>{{ .Likes }}</span></div>
-                            </footer>
-                            {{ else }}
-                            <p>oi</p>
-                            {{ end }}
-                        </div>
-                    </article>
+                        {{ if eq .AuthorID $.UserID }}
+                            {{ template "post-with-permission" . }}
+                        {{ else }}
+                            {{ template "post-without-permission" . }}
+                        {{ end }}
                     {{ else }}
                     <div class="no-posts-message">
                         <p class="mb-0">No posts yet. Be the first to share something!</p>
