@@ -1,0 +1,19 @@
+{{ define "create-post-form" }}
+<form class="create-post-container" novalidate>
+    <div class="d-flex">
+        <div class="profile-pic-placeholder" style="width:40px; height:40px;"></div>
+        <textarea class="form-control create-post-textarea" name="content" rows="2" placeholder="What's happening?" required></textarea>
+    </div>
+    <div class="create-post-actions">
+        <div class="create-post-icons">
+            <span><i class="bi bi-image"></i></span>
+            <span><i class="bi bi-filetype-gif"></i></span>
+            <span><i class="bi bi-bar-chart-line"></i></span>
+            <span><i class="bi bi-emoji-smile"></i></span>
+            <span><i class="bi bi-calendar-event"></i></span>
+            <span><i class="bi bi-geo-alt"></i></span>
+        </div>
+        <button type="submit" class="btn btn-post">Post</button>
+    </div>
+</form>
+{{ end }}
