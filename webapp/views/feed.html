@@ -30,6 +30,10 @@
         </div>
     </div>
 
+    <div id="no-posts-message-template" style="display: none;">
+        {{ template "no-posts-message" . }}
+    </div>
+
     {{ template "scripts" . }}
     {{ template "delete_post_modal" . }}
 </body>
