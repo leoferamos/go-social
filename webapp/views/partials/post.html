@@ -1,0 +1,37 @@
+{{ define "post-header" }}
+<header class="post-header">
+    <span class="post-author-name">{{ .AuthorUsername }}</span>
+    <span class="post-author-username">@{{ .AuthorUsername }}</span>
+    <span class="post-time" data-time="{{ .CreatedAt }}"></span>
+</header>
+{{ end }}
+
+{{ define "post-likes" }}
+<div><i class="bi bi-heart like-post" style="cursor: pointer;"></i> <span>{{ .Likes }}</span></div>
+{{ end }}
+
+{{ define "post-with-permission" }}
+<article class="feed-post" data-post-id="{{ .ID }}">
+    <div class="profile-pic-placeholder"></div>
+    <div class="post-content-area">
+        {{ template "post-header" . }}
+        <p class="post-text">{{ .Content }}</p>
+        <footer class="post-actions">
+            {{ template "post-likes" . }}
+        </footer>
+    </div>
+</article>
+{{ end }}
+
+{{ define "post-without-permission" }}
+<article class="feed-post" data-post-id="{{ .ID }}">
+    <div class="profile-pic-placeholder"></div>
+    <div class="post-content-area">
+        {{ template "post-header" . }}
+        <p class="post-text">{{ .Content }}</p>
+        <footer class="post-actions">
+            {{ template "post-likes" . }}
+        </footer>
+    </div>
+</article>
+{{ end }}
