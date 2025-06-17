@@ -9,49 +9,11 @@
     <link rel="stylesheet" href="/assets/css/feed.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold navbar-brand-custom" href="/feed">GoSocial</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" style="border-color: #38444D;">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link nav-link-custom active" aria-current="page" href="/feed">Feed</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link nav-link-custom" href="/profile">Profile</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link nav-link-custom" href="/logout">Logout</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
+    {{ template "navbar" . }}
     <div class="container-fluid p-0">
         <div class="row justify-content-center gx-0">
             <div class="col-12 col-md-10 col-lg-6 main-column-border">
-                <form class="create-post-container" novalidate>
-                    <div class="d-flex">
-                        <div class="profile-pic-placeholder" style="width:40px; height:40px;"></div>
-                        <textarea class="form-control create-post-textarea" name="content" rows="2" placeholder="What's happening?" required></textarea>
-                    </div>
-                    <div class="create-post-actions">
-                        <div class="create-post-icons">
-                            <span><i class="bi bi-image"></i></span>
-                            <span><i class="bi bi-filetype-gif"></i></span>
-                            <span><i class="bi bi-bar-chart-line"></i></span>
-                            <span><i class="bi bi-emoji-smile"></i></span>
-                            <span><i class="bi bi-calendar-event"></i></span>
-                            <span><i class="bi bi-geo-alt"></i></span>
-                        </div>
-                        <button type="submit" class="btn btn-post">Post</button>
-                    </div>
-                </form>
+                {{ template "create-post-form" . }}
                 <section id="feed-posts">
                     {{ range .Posts }}
                         {{ if eq .AuthorID $.UserID }}
@@ -60,59 +22,14 @@
                             {{ template "post-without-permission" . }}
                         {{ end }}
                     {{ else }}
-                    <div class="no-posts-message">
-                        <p class="mb-0">No posts yet. Be the first to share something!</p>
-                    </div>
+                        {{ template "no-posts-message" . }}
                     {{ end }}
                 </section>
-                <div id="loading-indicator" class="text-center my-4" style="display: none;">
-                    <div class="spinner-border" role="status">
-                        <span class="visually-hidden">Loading more posts...</span>
-                    </div>
-                </div>
+                {{ template "loading-indicator" . }}
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/assets/js/jquery.min.js"></script>
-    <script src="/assets/js/posts.js"></script>
-    <script>
-    function formatRelativeDate(dateString) {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffMs = now - date;
-        const diffSec = Math.floor(diffMs / 1000);
-        const diffMin = Math.floor(diffSec / 60);
-        const diffHour = Math.floor(diffMin / 60);
-        const diffDay = Math.floor(diffHour / 24);
-
-        if (diffSec < 60) return 'now';
-        if (diffMin < 60) return `${diffMin} min`;
-        if (diffHour < 24) return `${diffHour} h`;
-        if (diffDay < 7) return `${diffDay} d`;
-        return date.toLocaleDateString('en-US', { day: '2-digit', month: 'short' });
-    }
-
-    function formatFullDate(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true
-        });
-    }
-
-    document.querySelectorAll('.post-time').forEach(function(span) {
-        const iso = span.getAttribute('data-time');
-        if (iso) {
-            span.textContent = formatRelativeDate(iso);
-            span.title = formatFullDate(iso);
-        }
-    });
-    </script>
+    {{ template "scripts" . }}
 </body>
 </html>
