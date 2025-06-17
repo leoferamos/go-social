@@ -12,7 +12,7 @@ $(document).ready(function() {
             data: JSON.stringify({ content }),
             success: function(post) {
                 $('.create-post-textarea').val('');
-                const postHtml = `<article class="feed-post">
+                const postHtml = `<article class="feed-post" data-post-id="${post.id}">
                     <div class="profile-pic-placeholder"></div>
                     <div class="post-content-area">
                         <header class="post-header">
@@ -22,7 +22,10 @@ $(document).ready(function() {
                         </header>
                         <p class="post-text">${escapeHtml(post.content)}</p>
                         <footer class="post-actions">
-                            <div><i class="bi bi-heart"></i> <span>${post.likes}</span></div>
+                            <div>
+                                <i class="bi bi-heart like-post"></i>
+                                <span>${post.likes}</span>
+                            </div>
                         </footer>
                     </div>
                 </article>`;
@@ -53,6 +56,34 @@ $(document).ready(function() {
             }
         });
     }
+
+    // Like/Unlike handler
+    $('#feed-posts').on('click', '.like-post', function() {
+        const $icon = $(this);
+        const $post = $icon.closest('.feed-post');
+        const postId = $post.data('post-id');
+        const liked = $icon.hasClass('bi-heart-fill');
+
+        // Escolhe a rota correta
+        const url = liked ? `/posts/${postId}/unlike` : `/posts/${postId}/like`;
+
+        $.ajax({
+            url: url,
+            method: 'POST',
+            success: function(data) {
+                // data esperado: { id, likes, liked_by_me }
+                if (data.liked_by_me) {
+                    $icon.removeClass('bi-heart').addClass('bi-heart-fill text-danger');
+                } else {
+                    $icon.removeClass('bi-heart-fill text-danger').addClass('bi-heart');
+                }
+                $icon.next('span').text(data.likes);
+            },
+            error: function() {
+                alert('Error updating like status.');
+            }
+        });
+    });
 
     function escapeHtml(text) {
         return text
