@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
+	"webapp/src/cookies"
 	"webapp/src/responses"
 )
 
@@ -36,5 +37,41 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		responses.HandleStatusCode(w, response)
 		return
 	}
-	responses.JSON(w, response.StatusCode, nil)
+
+	loginData := map[string]string{
+		"identifier": user["email"],
+		"password":   user["password"],
+	}
+	loginJSON, err := json.Marshal(loginData)
+	if err != nil {
+		responses.JSON(w, http.StatusInternalServerError, map[string]string{"error": "Failed to prepare login data"})
+		return
+	}
+
+	loginResp, err := http.Post(apiURL+"/login", "application/json", bytes.NewBuffer(loginJSON))
+	if err != nil {
+		responses.JSON(w, http.StatusInternalServerError, map[string]string{"error": "Failed to login after registration"})
+		return
+	}
+	defer loginResp.Body.Close()
+	if loginResp.StatusCode >= 400 {
+		responses.HandleStatusCode(w, loginResp)
+		return
+	}
+
+	var authData struct {
+		ID    string `json:"id"`
+		Token string `json:"token"`
+	}
+	if err := json.NewDecoder(loginResp.Body).Decode(&authData); err != nil {
+		responses.JSON(w, http.StatusInternalServerError, map[string]string{"error": "Failed to decode login response"})
+		return
+	}
+
+	if err := cookies.Save(w, authData.ID, authData.Token); err != nil {
+		responses.JSON(w, http.StatusInternalServerError, map[string]string{"error": "Failed to save auth cookie"})
+		return
+	}
+
+	http.Redirect(w, r, "/feed", http.StatusSeeOther)
 }
