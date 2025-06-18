@@ -15,6 +15,10 @@ import (
 
 // LoadLoginPage handles the login page request.
 func LoadLoginPage(w http.ResponseWriter, r *http.Request) {
+	if utils.IsAuthenticated(r) {
+		http.Redirect(w, r, "/feed", http.StatusSeeOther)
+		return
+	}
 	utils.ExecuteTemplate(w, "login.html", nil)
 }
 
@@ -25,6 +29,10 @@ func LoadUsersPage(w http.ResponseWriter, r *http.Request) {
 
 // LoadRegisterPage handles the register page request.
 func LoadRegisterPage(w http.ResponseWriter, r *http.Request) {
+	if utils.IsAuthenticated(r) {
+		http.Redirect(w, r, "/feed", http.StatusSeeOther)
+		return
+	}
 	utils.ExecuteTemplate(w, "register.html", nil)
 }
 
