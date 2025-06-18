@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"net/http"
+	"io"
 	"text/template"
 )
 
@@ -14,14 +14,10 @@ func LoadTemplates() {
 }
 
 // ExecuteTemplate executes the specified template with the provided data.
-func ExecuteTemplate(w http.ResponseWriter, name string, data interface{}) error {
+func ExecuteTemplate(w io.Writer, name string, data interface{}) error {
 	if templates == nil {
 		LoadTemplates()
 	}
 
-	err := templates.ExecuteTemplate(w, name, data)
-	if err != nil {
-		return err
-	}
-	return nil
+	return templates.ExecuteTemplate(w, name, data)
 }
