@@ -13,7 +13,7 @@ var userRoutes = []Route{
 		RequiresAuth: false,
 	},
 	{
-		URI:          "/users/{userId:[0-9]+}",
+		URI:          "/users/{userId}",
 		Method:       http.MethodGet,
 		Function:     controllers.GetUser,
 		RequiresAuth: true,
