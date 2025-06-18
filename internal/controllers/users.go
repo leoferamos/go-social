@@ -74,7 +74,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusOK, user)
 }
 
-// GetUsers retrieves all users from the database
+// GetUser retrieves a user from the database by ID
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	parameters := mux.Vars(r)
 
