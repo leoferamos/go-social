@@ -17,13 +17,13 @@ func NewUsersRepository(db *sql.DB) *users {
 
 // CreateUser creates a new user in the database
 func (repository *users) CreateUser(user models.User) (uint64, error) {
-	statement, err := repository.db.Prepare("INSERT INTO users (name, username, email, password) VALUES (?, ?, ?, ?)")
+	statement, err := repository.db.Prepare("INSERT INTO users (name, username, email, password, bio) VALUES (?, ?, ?, ?, ?)")
 	if err != nil {
 		return 0, err
 	}
 	defer statement.Close()
 
-	result, err := statement.Exec(user.Name, user.Username, user.Email, user.Password)
+	result, err := statement.Exec(user.Name, user.Username, user.Email, user.Password, user.Bio)
 	if err != nil {
 		return 0, err
 	}
@@ -40,7 +40,7 @@ func (repository *users) GetUsers(nameOrUsername string) ([]models.User, error) 
 	nameOrUsername = fmt.Sprintf("%%%s%%", nameOrUsername)
 
 	rows, err := repository.db.Query(
-		"SELECT id, name, username, email, created_at FROM users WHERE name LIKE ? OR username LIKE ?",
+		"SELECT id, name, username, email, bio, created_at FROM users WHERE name LIKE ? OR username LIKE ?",
 		nameOrUsername, nameOrUsername,
 	)
 	if err != nil {
@@ -52,7 +52,7 @@ func (repository *users) GetUsers(nameOrUsername string) ([]models.User, error) 
 
 	for rows.Next() {
 		var user models.User
-		if err := rows.Scan(&user.ID, &user.Name, &user.Username, &user.Email, &user.CreatedAt); err != nil {
+		if err := rows.Scan(&user.ID, &user.Name, &user.Username, &user.Email, &user.Bio, &user.CreatedAt); err != nil {
 			return nil, err
 		}
 		users = append(users, user)
@@ -64,7 +64,7 @@ func (repository *users) GetUsers(nameOrUsername string) ([]models.User, error) 
 // GetUserByID retrieves a user from the database by ID
 func (repository *users) GetUserByID(userID uint64) (models.User, error) {
 	rows, err := repository.db.Query(
-		"SELECT id, name, username, email, created_at FROM users WHERE id = ?",
+		"SELECT id, name, username, email, bio, created_at FROM users WHERE id = ?",
 		userID,
 	)
 	if err != nil {
@@ -75,7 +75,7 @@ func (repository *users) GetUserByID(userID uint64) (models.User, error) {
 	var user models.User
 
 	if rows.Next() {
-		if err := rows.Scan(&user.ID, &user.Name, &user.Username, &user.Email, &user.CreatedAt); err != nil {
+		if err := rows.Scan(&user.ID, &user.Name, &user.Username, &user.Email, &user.Bio, &user.CreatedAt); err != nil {
 			return models.User{}, err
 		}
 	}
@@ -85,14 +85,14 @@ func (repository *users) GetUserByID(userID uint64) (models.User, error) {
 // UpdateUser updates an existing user in the database
 func (repository *users) UpdateUser(ID uint64, user models.User) error {
 	statement, err := repository.db.Prepare(
-		"UPDATE users SET name = ?, username = ?, email = ? WHERE id = ?",
+		"UPDATE users SET name = ?, username = ?, email = ?, bio = ? WHERE id = ?",
 	)
 	if err != nil {
 		return err
 	}
 	defer statement.Close()
 
-	if _, err := statement.Exec(user.Name, user.Username, user.Email, ID); err != nil {
+	if _, err := statement.Exec(user.Name, user.Username, user.Email, user.Bio, ID); err != nil {
 		return err
 	}
 	return nil
@@ -115,7 +115,7 @@ func (repository *users) DeleteUser(ID uint64) error {
 // GetUserByUsername retrieves a user from the database by username
 func (repository *users) GetUserByUsername(username string) (models.User, error) {
 	rows, err := repository.db.Query(
-		"SELECT id, name, username, email, password, created_at FROM users WHERE username = ?",
+		"SELECT id, name, username, email, password, bio, created_at FROM users WHERE username = ?",
 		username,
 	)
 	if err != nil {
@@ -124,7 +124,7 @@ func (repository *users) GetUserByUsername(username string) (models.User, error)
 	defer rows.Close()
 	var user models.User
 	if rows.Next() {
-		if err := rows.Scan(&user.ID, &user.Name, &user.Username, &user.Email, &user.Password, &user.CreatedAt); err != nil {
+		if err := rows.Scan(&user.ID, &user.Name, &user.Username, &user.Email, &user.Password, &user.Bio, &user.CreatedAt); err != nil {
 			return models.User{}, err
 		}
 	}
@@ -134,7 +134,7 @@ func (repository *users) GetUserByUsername(username string) (models.User, error)
 // GetUserByEmail retrieves a user from the database by email and return the id and hashed password
 func (repository *users) GetUserByEmail(email string) (models.User, error) {
 	rows, err := repository.db.Query(
-		"SELECT id, name, username, email, password, created_at FROM users WHERE email = ?",
+		"SELECT id, name, username, email, password, bio, created_at FROM users WHERE email = ?",
 		email,
 	)
 	if err != nil {
@@ -145,7 +145,7 @@ func (repository *users) GetUserByEmail(email string) (models.User, error) {
 	var user models.User
 
 	if rows.Next() {
-		if err := rows.Scan(&user.ID, &user.Name, &user.Username, &user.Email, &user.Password, &user.CreatedAt); err != nil {
+		if err := rows.Scan(&user.ID, &user.Name, &user.Username, &user.Email, &user.Password, &user.Bio, &user.CreatedAt); err != nil {
 			return models.User{}, err
 		}
 	}
