@@ -43,7 +43,14 @@
 <article class="feed-post" data-post-id="{{ .ID }}">
     <div class="profile-pic-placeholder"></div>
     <div class="post-content-area">
-        {{ template "post-header" . }}
+        <div class="d-flex justify-content-between align-items-start">
+            {{ template "post-header" . }}
+            <div class="dropdown">
+                <button class="btn btn-link p-0 text-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-three-dots"></i>
+                </button>
+            </div>
+        </div>
         <p class="post-text">{{ .Content }}</p>
         <footer class="post-actions">
             {{ template "post-likes" . }}
