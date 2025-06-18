@@ -37,6 +37,7 @@ $(document).ready(function() {
                         span.title = formatFullDate(iso);
                     }
                 });
+                $('#no-posts-message').remove();
             },
             error: function(xhr) {
                 let msg = 'Error creating post. Please try again.';
@@ -57,21 +58,20 @@ $(document).ready(function() {
         });
     }
 
-    // Like/Unlike handler
+
     $('#feed-posts').on('click', '.like-post', function() {
         const $icon = $(this);
         const $post = $icon.closest('.feed-post');
         const postId = $post.data('post-id');
         const liked = $icon.hasClass('bi-heart-fill');
 
-        // Escolhe a rota correta
+
         const url = liked ? `/posts/${postId}/unlike` : `/posts/${postId}/like`;
 
         $.ajax({
             url: url,
             method: 'POST',
             success: function(data) {
-                // data esperado: { id, likes, liked_by_me }
                 if (data.liked_by_me) {
                     $icon.removeClass('bi-heart').addClass('bi-heart-fill text-danger');
                 } else {
@@ -105,6 +105,9 @@ $(document).ready(function() {
                 postIdToDelete = null;
                 const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deletePostModal'));
                 deleteModal.hide();
+                if ($('#feed-posts .feed-post').length === 0) {
+                    $('#feed-posts').append($('#no-posts-message-template').html());
+                }
             },
             error: function(xhr) {
                 let msg = 'Error deleting post.';
