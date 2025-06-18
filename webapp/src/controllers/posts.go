@@ -7,8 +7,10 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"webapp/src/models"
 	"webapp/src/requests"
 	"webapp/src/responses"
+	"webapp/src/utils"
 
 	"github.com/gorilla/mux"
 )
@@ -53,10 +55,24 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(response.StatusCode)
-	if _, err := io.Copy(w, response.Body); err != nil {
+	// Parse API response to get the created post object
+	var createdPost models.Post
+	if err := json.NewDecoder(response.Body).Decode(&createdPost); err != nil {
+		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: "Failed to parse created post"})
+		return
 	}
+
+	// Render the post-with-permission template as HTML
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	var buf bytes.Buffer
+	err = utils.ExecuteTemplate(&buf, "post-with-permission", createdPost)
+	if err != nil {
+		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: "Failed to render post template"})
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(buf.Bytes())
+	return
 }
 
 // LikePost calls the API to like a post.
