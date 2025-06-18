@@ -10,26 +10,9 @@ $(document).ready(function() {
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ content }),
-            success: function(post) {
+            success: function(html) {
                 $('.create-post-textarea').val('');
-                const postHtml = `<article class="feed-post" data-post-id="${post.id}">
-                    <div class="profile-pic-placeholder"></div>
-                    <div class="post-content-area">
-                        <header class="post-header">
-                            <span class="post-author-name">${escapeHtml(post.author_username)}</span>
-                            <span class="post-author-username">@${escapeHtml(post.author_username)}</span>
-                            <span class="post-time" data-time="${escapeHtml(post.created_at)}" title=""></span>
-                        </header>
-                        <p class="post-text">${escapeHtml(post.content)}</p>
-                        <footer class="post-actions">
-                            <div>
-                                <i class="bi bi-heart like-post"></i>
-                                <span>${post.likes}</span>
-                            </div>
-                        </footer>
-                    </div>
-                </article>`;
-                $('#feed-posts').prepend(postHtml);
+                $('#feed-posts').prepend(html);
                 document.querySelectorAll('.post-time').forEach(function(span) {
                     const iso = span.getAttribute('data-time');
                     if (iso) {
