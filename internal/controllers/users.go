@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -350,4 +351,60 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	responses.JSON(w, http.StatusNoContent, nil)
+}
+
+// GetUserByUsername retrieves a user by username
+func GetUserByUsername(w http.ResponseWriter, r *http.Request) {
+	parameters := mux.Vars(r)
+	username := parameters["username"]
+
+	dbConn, err := db.Connect()
+	if err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	defer dbConn.Close()
+
+	repository := repositories.NewUsersRepository(dbConn)
+	user, err := repository.GetUserByUsername(username)
+	if err != nil {
+		responses.JSONError(w, http.StatusNotFound, errors.New("user not found"))
+		return
+	}
+
+	postsRepo := repositories.NewPostsRepository(dbConn)
+	var posts []models.Posts
+	var postsErr error
+
+	userIDFromToken, err := auth.ExtractUserID(r)
+	if err == nil {
+		posts, postsErr = postsRepo.GetUserPosts(user.ID, userIDFromToken)
+	} else {
+		posts, postsErr = postsRepo.GetUserPosts(user.ID, 0)
+	}
+	if postsErr != nil {
+		responses.JSONError(w, http.StatusInternalServerError, postsErr)
+		return
+	}
+
+	followers, err := repository.GetFollowers(user.ID)
+	if err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	following, err := repository.GetFollowing(user.ID)
+	if err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	profile := models.Profile{
+		User:      user,
+		Posts:     posts,
+		Bio:       user.Bio,
+		Followers: len(followers),
+		Following: len(following),
+		CreatedAt: user.CreatedAt.Format(time.RFC3339),
+	}
+	responses.JSON(w, http.StatusOK, profile)
 }
