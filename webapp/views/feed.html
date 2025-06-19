@@ -10,9 +10,9 @@
 </head>
 <body>
     {{ template "navbar" . }}
-    <div class="container-fluid p-0">
-        <div class="row justify-content-center gx-0">
-            <div class="col-12 col-md-10 col-lg-6 main-column-border">
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6 main-column-border">
                 {{ template "create-post-form" . }}
                 <section id="feed-posts">
                     {{ range .Posts }}
