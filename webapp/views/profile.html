@@ -13,71 +13,69 @@
     {{ template "navbar" . }}
     <div class="container mt-4">
         <div class="row justify-content-center">
-            <div class="col-12 col-md-8 col-lg-6">
-                <div class="profile-card">
-                    <div class="profile-banner position-relative">
-                        <img class="profile-banner-img" src="/assets/img/banner-placeholder.jpg" alt="Banner" />
-                        <div class="profile-avatar-wrapper">
-                            <img class="profile-avatar" src="/assets/img/avatar-placeholder.png" alt="Avatar">
-                        </div>
+            <div class="col-12 col-md-8 col-lg-6 main-column-border">
+                <div class="profile-banner position-relative">
+                    <img class="profile-banner-img" src="/assets/img/banner-placeholder.jpg" alt="Banner" />
+                    <div class="profile-avatar-wrapper">
+                        <img class="profile-avatar" src="/assets/img/avatar-placeholder.png" alt="Avatar">
                     </div>
-                    <div class="profile-header d-flex justify-content-between align-items-start px-4 pt-2">
-                        <div class="profile-header-info">
-                            <h2 class="profile-name mb-0 d-flex align-items-center">
-                                {{ index .Profile.User "name" }}
-                            </h2>
-                            <span class="profile-username">@{{ index .Profile.User "username" }}</span>
-                        </div>
-                        <div class="profile-header-action">
-                            {{ if eq .UserID (printf "%v" (index .Profile.User "id")) }}
-                                <a href="#" class="btn btn-outline-primary btn-sm">Edit Profile</a>
+                </div>
+                <div class="profile-header d-flex justify-content-between align-items-start px-4 pt-2">
+                    <div class="profile-header-info">
+                        <h2 class="profile-name mb-0 d-flex align-items-center">
+                            {{ index .Profile.User "name" }}
+                        </h2>
+                        <span class="profile-username">@{{ index .Profile.User "username" }}</span>
+                    </div>
+                    <div class="profile-header-action">
+                        {{ if eq .UserID (printf "%v" (index .Profile.User "id")) }}
+                            <a href="#" class="btn btn-outline-primary btn-sm">Edit Profile</a>
+                        {{ else }}
+                            <button class="btn btn-primary btn-sm" id="follow-btn">Follow</button>
+                        {{ end }}
+                    </div>
+                </div>
+                <div class="profile-body px-4 pb-0 pt-2">
+                    <div class="profile-bio mt-2">{{ .Profile.Bio }}</div>
+                    <div class="profile-links mt-1">
+                        <!-- Example: <a href="#">website.com</a> -->
+                    </div>
+                    <div class="profile-meta mt-2 d-flex flex-wrap gap-3">
+                        <span><i class="bi bi-calendar3"></i> Joined <span id="profile-join-date">{{ index .Profile.User "created_at" }}</span></span>
+                    </div>
+                    <div class="profile-stats mt-3 d-flex gap-4">
+                        <span><b>{{ .Profile.Following }}</b> <span class="stat-label">Following</span></span>
+                        <span><b>{{ .Profile.Followers }}</b> <span class="stat-label">Followers</span></span>
+                    </div>
+                </div>
+                <div class="profile-tabs mt-4 px-4">
+                    <ul class="nav nav-tabs border-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">Posts</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled" href="#">Replies</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled" href="#">Media</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled" href="#">Likes</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="profile-posts px-4 pb-4">
+                    <section id="profile-posts">
+                        {{ range .Profile.Posts }}
+                            {{ if eq (printf "%v" .AuthorID) $.UserID }}
+                                {{ template "post-with-permission" . }}
                             {{ else }}
-                                <button class="btn btn-primary btn-sm" id="follow-btn">Follow</button>
+                                {{ template "post-without-permission" . }}
                             {{ end }}
-                        </div>
-                    </div>
-                    <div class="profile-body px-4 pb-0 pt-2">
-                        <div class="profile-bio mt-2">{{ .Profile.Bio }}</div>
-                        <div class="profile-links mt-1">
-                            <!-- Example: <a href="#">website.com</a> -->
-                        </div>
-                        <div class="profile-meta mt-2 d-flex flex-wrap gap-3">
-                            <span><i class="bi bi-calendar3"></i> Joined <span id="profile-join-date">{{ index .Profile.User "created_at" }}</span></span>
-                        </div>
-                        <div class="profile-stats mt-3 d-flex gap-4">
-                            <span><b>{{ .Profile.Following }}</b> <span class="stat-label">Following</span></span>
-                            <span><b>{{ .Profile.Followers }}</b> <span class="stat-label">Followers</span></span>
-                        </div>
-                    </div>
-                    <div class="profile-tabs mt-4 px-4">
-                        <ul class="nav nav-tabs border-0">
-                            <li class="nav-item">
-                                <a class="nav-link active" href="#">Posts</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link disabled" href="#">Replies</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link disabled" href="#">Media</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link disabled" href="#">Likes</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="profile-posts px-4 pb-4">
-                        <section id="profile-posts">
-                            {{ range .Profile.Posts }}
-                                {{ if eq (printf "%v" .AuthorID) $.UserID }}
-                                    {{ template "post-with-permission" . }}
-                                {{ else }}
-                                    {{ template "post-without-permission" . }}
-                                {{ end }}
-                            {{ else }}
-                                {{ template "no-posts-message" . }}
-                            {{ end }}
-                        </section>
-                    </div>
+                        {{ else }}
+                            {{ template "no-posts-message" . }}
+                        {{ end }}
+                    </section>
                 </div>
             </div>
         </div>
