@@ -18,4 +18,10 @@ var userRoutes = []Route{
 		Function:     controllers.CreateUser,
 		RequiresAuth: false,
 	},
+	{
+		URI:          "/profile/{username}",
+		Method:       http.MethodGet,
+		Function:     controllers.LoadProfilePage,
+		RequiresAuth: false,
+	},
 }
