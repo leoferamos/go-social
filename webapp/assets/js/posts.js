@@ -42,7 +42,7 @@ $(document).ready(function() {
     }
 
 
-    $('#feed-posts').on('click', '.like-post', function() {
+    $('#profile-posts, #feed-posts').on('click', '.like-post', function() {
         const $icon = $(this);
         const $post = $icon.closest('.feed-post');
         const postId = $post.data('post-id');
@@ -70,7 +70,7 @@ $(document).ready(function() {
     
     let postIdToDelete = null;
 
-    $('#feed-posts').on('click', '.delete-post-btn', function(e) {
+    $('#profile-posts, #feed-posts').on('click', '.delete-post-btn', function(e) {
         e.preventDefault();
         postIdToDelete = $(this).data('post-id');
         const deleteModal = new bootstrap.Modal(document.getElementById('deletePostModal'));
