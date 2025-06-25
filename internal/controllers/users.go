@@ -398,13 +398,19 @@ func GetUserByUsername(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	profile := models.Profile{
-		User:      user,
-		Posts:     posts,
+	publicUser := models.PublicUser{
+		ID:        user.ID,
+		Name:      user.Name,
+		Username:  user.Username,
 		Bio:       user.Bio,
+		CreatedAt: user.CreatedAt.Format(time.RFC3339),
+	}
+
+	profile := models.Profile{
+		User:      publicUser,
+		Posts:     posts,
 		Followers: len(followers),
 		Following: len(following),
-		CreatedAt: user.CreatedAt.Format(time.RFC3339),
 	}
 	responses.JSON(w, http.StatusOK, profile)
 }
