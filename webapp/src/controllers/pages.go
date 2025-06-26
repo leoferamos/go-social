@@ -110,7 +110,12 @@ func LoadProfilePage(w http.ResponseWriter, r *http.Request) {
 	}
 	cookie, _ := cookies.Read(r)
 
-	userID := cookie["id"]
+	userID, _ := strconv.ParseUint(cookie["id"], 10, 64)
+	username, err = utils.GetLoggedUsername(r, apiURL, userID)
+	if err != nil {
+		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: "Failed to get username"})
+		return
+	}
 	utils.ExecuteTemplate(w, "profile.html", map[string]interface{}{
 		"Profile":  profileData,
 		"UserID":   userID,
