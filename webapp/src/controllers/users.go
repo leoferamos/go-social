@@ -3,16 +3,10 @@ package controllers
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"os"
 	"webapp/src/cookies"
-	"webapp/src/models"
-	"webapp/src/requests"
 	"webapp/src/responses"
-	"webapp/src/utils"
-
-	"github.com/gorilla/mux"
 )
 
 // CreateUser handles user registration.
@@ -80,37 +74,4 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/feed", http.StatusSeeOther)
-}
-
-// LoadProfilePage retrieves and displays a user's profile page.
-func LoadProfilePage(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	username := vars["username"]
-	apiURL := os.Getenv("API_URL")
-	if apiURL == "" {
-		apiURL = "http://api:5000"
-	}
-	url := fmt.Sprintf("%s/profile/%s", apiURL, username)
-
-	resp, err := requests.MakeAuthenticatedRequest(r, http.MethodGet, url, nil)
-	if err != nil {
-		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: err.Error()})
-		return
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode >= 400 {
-		responses.HandleStatusCode(w, resp)
-		return
-	}
-	var profileData models.Profile
-	if err := json.NewDecoder(resp.Body).Decode(&profileData); err != nil {
-		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: "Failed to decode profile data"})
-		return
-	}
-	cookie, _ := cookies.Read(r)
-	userID := cookie["id"]
-	utils.ExecuteTemplate(w, "profile.html", map[string]interface{}{
-		"Profile": profileData,
-		"UserID":  userID,
-	})
 }
