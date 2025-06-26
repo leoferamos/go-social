@@ -372,6 +372,28 @@ func GetUserByUsername(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	responses.JSON(w, http.StatusOK, user)
+}
+
+// GetProfileByUsername retrieves a user profile (aggregated info) by username
+func GetProfileByUsername(w http.ResponseWriter, r *http.Request) {
+	parameters := mux.Vars(r)
+	username := parameters["username"]
+
+	dbConn, err := db.Connect()
+	if err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	defer dbConn.Close()
+
+	repository := repositories.NewUsersRepository(dbConn)
+	user, err := repository.GetUserByUsername(username)
+	if err != nil {
+		responses.JSONError(w, http.StatusNotFound, errors.New("user not found"))
+		return
+	}
+
 	postsRepo := repositories.NewPostsRepository(dbConn)
 	var posts []models.Posts
 	var postsErr error
