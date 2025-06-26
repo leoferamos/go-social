@@ -36,10 +36,9 @@ func (r Posts) CreatePost(post models.Posts) (uint64, error) {
 }
 
 // GetPost retrieves a post by its ID from the database.
-// Agora recebe o userID autenticado para calcular LikedByMe
 func (r Posts) GetPostByID(id uint64, userID uint64) (models.Posts, error) {
 	rows, err := r.db.Query(
-		`SELECT p.id, p.content, p.author_id, u.username,
+		`SELECT p.id, p.content, p.author_id, u.username, u.name,
 			COUNT(pl.user_id) AS likes, p.created_at,
 			CASE WHEN EXISTS (
 				SELECT 1 FROM post_likes pl2 WHERE pl2.post_id = p.id AND pl2.user_id = ?
@@ -48,7 +47,8 @@ func (r Posts) GetPostByID(id uint64, userID uint64) (models.Posts, error) {
 		INNER JOIN users u ON u.id = p.author_id
 		LEFT JOIN post_likes pl ON pl.post_id = p.id
 		WHERE p.id = ?
-		GROUP BY p.id, p.content, p.author_id, u.username, p.created_at`,
+		GROUP BY p.id, p.content, p.author_id, u.username, u.name, p.created_at
+		`,
 		userID, id,
 	)
 	if err != nil {
@@ -62,6 +62,7 @@ func (r Posts) GetPostByID(id uint64, userID uint64) (models.Posts, error) {
 			&post.Content,
 			&post.AuthorID,
 			&post.AuthorUsername,
+			&post.AuthorName,
 			&post.Likes,
 			&post.CreatedAt,
 			&post.LikedByMe,
@@ -75,7 +76,7 @@ func (r Posts) GetPostByID(id uint64, userID uint64) (models.Posts, error) {
 // GetPosts Gets the posts of people the user follows and their own posts.
 func (r Posts) GetPosts(userID uint64) ([]models.Posts, error) {
 	rows, err := r.db.Query(
-		`SELECT p.id, p.content, p.author_id, u.username,
+		`SELECT p.id, p.content, p.author_id, u.username, u.name,
 			COUNT(pl.user_id) AS likes, p.created_at,
 			CASE WHEN EXISTS (
 				SELECT 1 FROM post_likes pl2 WHERE pl2.post_id = p.id AND pl2.user_id = ?
@@ -85,7 +86,7 @@ func (r Posts) GetPosts(userID uint64) ([]models.Posts, error) {
 		LEFT JOIN followers f ON f.user_id = p.author_id AND f.follower_id = ?
 		LEFT JOIN post_likes pl ON pl.post_id = p.id
 		WHERE f.follower_id IS NOT NULL OR p.author_id = ?
-		GROUP BY p.id, p.content, p.author_id, u.username, p.created_at
+		GROUP BY p.id, p.content, p.author_id, u.username, u.name, p.created_at
 		ORDER BY p.created_at DESC`,
 		userID, userID, userID,
 	)
@@ -101,6 +102,7 @@ func (r Posts) GetPosts(userID uint64) ([]models.Posts, error) {
 			&post.Content,
 			&post.AuthorID,
 			&post.AuthorUsername,
+			&post.AuthorName,
 			&post.Likes,
 			&post.CreatedAt,
 			&post.LikedByMe,
@@ -143,10 +145,9 @@ func (r Posts) DeletePost(postID uint64) error {
 }
 
 // GetUserPosts Gets the posts of a user.
-// Agora preenche o campo LikedByMe
 func (r Posts) GetUserPosts(targetUserID uint64, userID uint64) ([]models.Posts, error) {
 	rows, err := r.db.Query(
-		`SELECT p.id, p.content, p.author_id, u.username,
+		`SELECT p.id, p.content, p.author_id, u.username, u.name,
 			COUNT(pl.user_id) AS likes, p.created_at,
 			CASE WHEN EXISTS (
 				SELECT 1 FROM post_likes pl2 WHERE pl2.post_id = p.id AND pl2.user_id = ?
@@ -155,7 +156,7 @@ func (r Posts) GetUserPosts(targetUserID uint64, userID uint64) ([]models.Posts,
 		INNER JOIN users u ON u.id = p.author_id
 		LEFT JOIN post_likes pl ON pl.post_id = p.id
 		WHERE p.author_id = ?
-		GROUP BY p.id, p.content, p.author_id, u.username, p.created_at
+		GROUP BY p.id, p.content, p.author_id, u.username, u.name, p.created_at
 		ORDER BY p.created_at DESC`,
 		userID, targetUserID,
 	)
@@ -171,6 +172,7 @@ func (r Posts) GetUserPosts(targetUserID uint64, userID uint64) ([]models.Posts,
 			&post.Content,
 			&post.AuthorID,
 			&post.AuthorUsername,
+			&post.AuthorName,
 			&post.Likes,
 			&post.CreatedAt,
 			&post.LikedByMe,
