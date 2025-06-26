@@ -23,12 +23,12 @@
                 <div class="profile-header d-flex justify-content-between align-items-start px-4 pt-2">
                     <div class="profile-header-info">
                         <h2 class="profile-name mb-0 d-flex align-items-center">
-                            {{ index .Profile.User "name" }}
+                            {{ index .Profile.User.Name }}
                         </h2>
-                        <span class="profile-username">@{{ index .Profile.User "username" }}</span>
+                        <span class="profile-username">@{{ index .Profile.User.Username }}</span>
                     </div>
                     <div class="profile-header-action">
-                        {{ if eq .UserID (printf "%v" (index .Profile.User "id")) }}
+                        {{ if eq .UserID .Profile.User.ID}}
                             <a href="#" class="btn btn-outline-primary btn-sm">Edit Profile</a>
                         {{ else }}
                             <button class="btn btn-primary btn-sm" id="follow-btn">Follow</button>
@@ -36,11 +36,11 @@
                     </div>
                 </div>
                 <div class="profile-body px-4 pb-0 pt-2">
-                    <div class="profile-bio mt-2">{{ .Profile.Bio }}</div>
+                    <div class="profile-bio mt-2">{{ .Profile.User.Bio }}</div>
                     <div class="profile-links mt-1">
                     </div>
                     <div class="profile-meta mt-2 d-flex flex-wrap gap-3">
-                        <span><i class="bi bi-calendar3"></i> Joined <span id="profile-join-date">{{ index .Profile.User "created_at" }}</span></span>
+                        <span><i class="bi bi-calendar3"></i> Joined <span id="profile-join-date">{{ index .Profile.User.CreatedAt }}</span></span>
                     </div>
                     <div class="profile-stats mt-3 d-flex gap-4">
                         <span><b>{{ .Profile.Following }}</b> <span class="stat-label">Following</span></span>
@@ -66,7 +66,7 @@
                 <div class="profile-posts px-4 pb-4">
                     <section id="profile-posts">
                         {{ range .Profile.Posts }}
-                            {{ if eq (printf "%v" .AuthorID) $.UserID }}
+                            {{ if eq .AuthorID $.UserID }}
                                 {{ template "post-with-permission" . }}
                             {{ else }}
                                 {{ template "post-without-permission" . }}
