@@ -19,6 +19,12 @@ var userRoutes = []Route{
 		RequiresAuth: true,
 	},
 	{
+		URI:          "/users/{username}",
+		Method:       http.MethodGet,
+		Function:     controllers.GetUserByUsername,
+		RequiresAuth: false,
+	},
+	{
 		URI:          "/users",
 		Method:       http.MethodGet,
 		Function:     controllers.GetUsers,
@@ -69,7 +75,7 @@ var userRoutes = []Route{
 	{
 		URI:          "/profile/{username}",
 		Method:       http.MethodGet,
-		Function:     controllers.GetUserByUsername,
+		Function:     controllers.GetProfileByUsername,
 		RequiresAuth: false,
 	},
 }
