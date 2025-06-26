@@ -42,9 +42,9 @@ func LoadFeedPage(w http.ResponseWriter, r *http.Request) {
 	if apiURL == "" {
 		apiURL = "http://api:5000"
 	}
-	apiURL = fmt.Sprintf("%s/posts", apiURL)
+	postsApiURL := fmt.Sprintf("%s/posts", apiURL)
 
-	response, err := requests.MakeAuthenticatedRequest(r, http.MethodGet, apiURL, nil)
+	response, err := requests.MakeAuthenticatedRequest(r, http.MethodGet, postsApiURL, nil)
 	if err != nil {
 		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: err.Error()})
 		return
@@ -64,11 +64,26 @@ func LoadFeedPage(w http.ResponseWriter, r *http.Request) {
 
 	userID, _ := strconv.ParseUint(cookie["id"], 10, 64)
 
+	username := ""
+	userURL := fmt.Sprintf("%s/users/%d", apiURL, userID)
+	userResp, err := requests.MakeAuthenticatedRequest(r, http.MethodGet, userURL, nil)
+	if err == nil && userResp.StatusCode < 400 {
+		defer userResp.Body.Close()
+		var userData struct {
+			Username string `json:"username"`
+		}
+		if err := json.NewDecoder(userResp.Body).Decode(&userData); err == nil {
+			username = userData.Username
+		}
+	}
+
 	utils.ExecuteTemplate(w, "feed.html", struct {
-		Posts  []models.Post
-		UserID uint64
+		Posts    []models.Post
+		UserID   uint64
+		Username string
 	}{
-		Posts:  posts,
-		UserID: userID,
+		Posts:    posts,
+		UserID:   userID,
+		Username: username,
 	})
 }
