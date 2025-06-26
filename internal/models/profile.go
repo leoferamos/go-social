@@ -1,5 +1,6 @@
 package models
 
+// PublicUser represents a public view of a user's profile.
 type PublicUser struct {
 	ID        uint64 `json:"id"`
 	Name      string `json:"name"`
@@ -8,6 +9,7 @@ type PublicUser struct {
 	CreatedAt string `json:"created_at"`
 }
 
+// Profile represents a user's profile in the application.
 type Profile struct {
 	User      PublicUser `json:"user"`
 	Posts     []Posts    `json:"posts"`
