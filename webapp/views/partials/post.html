@@ -1,7 +1,7 @@
 {{ define "post-header" }}
 <header class="post-header">
-    <span class="post-author-name">{{ .AuthorUsername }}</span>
-    <span class="post-author-username">@{{ .AuthorUsername }}</span>
+    <span class="post-author-name">{{ .AuthorName }}</span>
+    <span class="post-author-username">@{{ .AuthorUsername }} ·</span>
     <span class="post-time" data-time="{{ .CreatedAt }}"></span>
 </header>
 {{ end }}
