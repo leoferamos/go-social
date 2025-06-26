@@ -66,17 +66,10 @@ func LoadFeedPage(w http.ResponseWriter, r *http.Request) {
 
 	userID, _ := strconv.ParseUint(cookie["id"], 10, 64)
 
-	username := ""
-	userURL := fmt.Sprintf("%s/users/%d", apiURL, userID)
-	userResp, err := requests.MakeAuthenticatedRequest(r, http.MethodGet, userURL, nil)
-	if err == nil && userResp.StatusCode < 400 {
-		defer userResp.Body.Close()
-		var userData struct {
-			Username string `json:"username"`
-		}
-		if err := json.NewDecoder(userResp.Body).Decode(&userData); err == nil {
-			username = userData.Username
-		}
+	username, err := utils.GetLoggedUsername(r, apiURL, userID)
+	if err != nil {
+		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: "Failed to get username"})
+		return
 	}
 
 	utils.ExecuteTemplate(w, "feed.html", struct {
@@ -116,9 +109,11 @@ func LoadProfilePage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	cookie, _ := cookies.Read(r)
+
 	userID := cookie["id"]
 	utils.ExecuteTemplate(w, "profile.html", map[string]interface{}{
-		"Profile": profileData,
-		"UserID":  userID,
+		"Profile":  profileData,
+		"UserID":   userID,
+		"Username": username,
 	})
 }
