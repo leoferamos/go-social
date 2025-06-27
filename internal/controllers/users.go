@@ -399,11 +399,17 @@ func GetProfileByUsername(w http.ResponseWriter, r *http.Request) {
 	var postsErr error
 
 	userIDFromToken, err := auth.ExtractUserID(r)
-	if err == nil {
-		posts, postsErr = postsRepo.GetUserPosts(user.ID, userIDFromToken)
-	} else {
-		posts, postsErr = postsRepo.GetUserPosts(user.ID, 0)
+
+	isFollowing := false
+	if err == nil && userIDFromToken != user.ID {
+		isFollowing, err = repository.IsFollowing(user.ID, userIDFromToken)
+		if err != nil {
+			responses.JSONError(w, http.StatusInternalServerError, err)
+			return
+		}
 	}
+
+	posts, postsErr = postsRepo.GetUserPosts(user.ID, userIDFromToken)
 	if postsErr != nil {
 		responses.JSONError(w, http.StatusInternalServerError, postsErr)
 		return
@@ -426,13 +432,14 @@ func GetProfileByUsername(w http.ResponseWriter, r *http.Request) {
 		Username:  user.Username,
 		Bio:       user.Bio,
 		CreatedAt: user.CreatedAt.Format(time.RFC3339),
+		Followers: len(followers),
+		Following: len(following),
 	}
 
 	profile := models.Profile{
-		User:      publicUser,
-		Posts:     posts,
-		Followers: len(followers),
-		Following: len(following),
+		User:        publicUser,
+		IsFollowing: isFollowing,
+		Posts:       posts,
 	}
 	responses.JSON(w, http.StatusOK, profile)
 }
