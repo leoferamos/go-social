@@ -184,6 +184,27 @@ func (repository *users) UnfollowUser(userID, followerID uint64) error {
 	return nil
 }
 
+// IsFollowing checks if a user is following another user
+func (repository *users) IsFollowing(userID, followerID uint64) (bool, error) {
+	rows, err := repository.db.Query(
+		"SELECT COUNT(*) FROM followers WHERE user_id = ? AND follower_id = ?",
+		userID, followerID,
+	)
+	if err != nil {
+		return false, err
+	}
+	defer rows.Close()
+
+	var count int
+	if rows.Next() {
+		if err := rows.Scan(&count); err != nil {
+			return false, err
+		}
+	}
+
+	return count > 0, nil
+}
+
 // GetFollowers retrieves the followers of a user
 func (repository *users) GetFollowers(userID uint64) ([]models.User, error) {
 	rows, err := repository.db.Query(`
