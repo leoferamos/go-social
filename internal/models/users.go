@@ -17,6 +17,8 @@ type User struct {
 	Email     string    `json:"email,omitempty"`
 	Password  string    `json:"password,omitempty"`
 	Bio       string    `json:"bio,omitempty"`
+	AvatarURL string    `json:"avatar_url,omitempty"`
+	BannerURL string    `json:"banner_url,omitempty"`
 	CreatedAt time.Time `json:"created_at,omitempty"`
 }
 
