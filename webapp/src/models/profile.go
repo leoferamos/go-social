@@ -7,12 +7,13 @@ type PublicUser struct {
 	Username  string `json:"username"`
 	Bio       string `json:"bio"`
 	CreatedAt string `json:"created_at"`
+	Followers int    `json:"followers"`
+	Following int    `json:"following"`
 }
 
 // Profile represents a user's profile in the application.
 type Profile struct {
-	User      PublicUser `json:"user"`
-	Posts     []Post     `json:"posts"`
-	Followers int        `json:"followers"`
-	Following int        `json:"following"`
+	User        PublicUser `json:"user"`
+	IsFollowing bool       `json:"is_following"`
+	Posts       []Post     `json:"posts"`
 }
