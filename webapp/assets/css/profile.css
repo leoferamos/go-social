@@ -72,6 +72,11 @@ body {
     color: #1D9BF0;
     border: 1px solid #1D9BF0;
 }
+.profile-header-action .btn.following.btn-outline-primary:hover {
+    background: #ff4d4f;
+    color: #fff;
+    border-color: #ff4d4f;
+}
 .profile-header-action .btn:hover {
     background: #1570b7;
     color: #fff;
