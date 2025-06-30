@@ -6,7 +6,10 @@ import (
 	"net/http"
 	"os"
 	"webapp/src/cookies"
+	"webapp/src/requests"
 	"webapp/src/responses"
+
+	"github.com/gorilla/mux"
 )
 
 // CreateUser handles user registration.
@@ -74,4 +77,56 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/feed", http.StatusSeeOther)
+}
+
+// FollowUser calls the API to follow a user.
+func FollowUser(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userID := vars["userId"]
+
+	apiURL := os.Getenv("API_URL")
+	if apiURL == "" {
+		apiURL = "http://api:5000"
+	}
+
+	followURL := apiURL + "/users/" + userID + "/follow"
+	response, err := requests.MakeAuthenticatedRequest(r, http.MethodPost, followURL, nil)
+	if err != nil {
+		responses.JSON(w, http.StatusInternalServerError, map[string]string{"error": "Failed to follow user"})
+		return
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode >= 400 {
+		responses.HandleStatusCode(w, response)
+		return
+	}
+
+	responses.JSON(w, http.StatusOK, map[string]bool{"following": true})
+}
+
+// UnfollowUser calls the API to follow a user.
+func UnfollowUser(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userID := vars["userId"]
+
+	apiURL := os.Getenv("API_URL")
+	if apiURL == "" {
+		apiURL = "http://api:5000"
+	}
+
+	followURL := apiURL + "/users/" + userID + "/unfollow"
+	response, err := requests.MakeAuthenticatedRequest(r, http.MethodPost, followURL, nil)
+	if err != nil {
+		responses.JSON(w, http.StatusInternalServerError, map[string]string{"error": "Failed to unfollow user"})
+		return
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode >= 400 {
+		responses.HandleStatusCode(w, response)
+		return
+	}
+
+	responses.JSON(w, http.StatusOK, map[string]bool{"following": false})
 }
