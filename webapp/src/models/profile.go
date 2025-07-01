@@ -4,6 +4,8 @@ package models
 type PublicUser struct {
 	ID        uint64 `json:"id"`
 	Name      string `json:"name"`
+	AvatarURL string `json:"avatar_url,omitempty"`
+	BannerURL string `json:"banner_url,omitempty"`
 	Username  string `json:"username"`
 	Bio       string `json:"bio"`
 	CreatedAt string `json:"created_at"`
