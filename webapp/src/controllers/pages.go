@@ -61,7 +61,6 @@ func LoadFeedPage(w http.ResponseWriter, r *http.Request) {
 		responses.JSON(w, http.StatusUnprocessableEntity, responses.ErrorAPI{Error: err.Error()})
 		return
 	}
-
 	for i := range posts {
 		if posts[i].AuthorAvatarURL == "" {
 			posts[i].AuthorAvatarURL = "/assets/img/avatar-placeholder.png"
@@ -69,23 +68,34 @@ func LoadFeedPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cookie, _ := cookies.Read(r)
-
 	userID, _ := strconv.ParseUint(cookie["id"], 10, 64)
 
-	username, err := utils.GetLoggedUsername(r, apiURL, userID)
+	userApiURL := fmt.Sprintf("%s/users/%d", apiURL, userID)
+	userResp, err := requests.MakeAuthenticatedRequest(r, http.MethodGet, userApiURL, nil)
 	if err != nil {
-		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: "Failed to get username"})
+		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: "Failed to get user data"})
 		return
+	}
+	defer userResp.Body.Close()
+	var userData models.PublicUser
+	if err := json.NewDecoder(userResp.Body).Decode(&userData); err != nil {
+		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: "Failed to decode user data"})
+		return
+	}
+	if userData.AvatarURL == "" {
+		userData.AvatarURL = "/assets/img/avatar-placeholder.png"
 	}
 
 	utils.ExecuteTemplate(w, "feed.html", struct {
-		Posts    []models.Post
-		UserID   uint64
-		Username string
+		Posts     []models.Post
+		UserID    uint64
+		Username  string
+		AvatarURL string
 	}{
-		Posts:    posts,
-		UserID:   userID,
-		Username: username,
+		Posts:     posts,
+		UserID:    userID,
+		Username:  userData.Username,
+		AvatarURL: userData.AvatarURL,
 	})
 }
 
