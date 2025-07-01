@@ -62,6 +62,12 @@ func LoadFeedPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	for i := range posts {
+		if posts[i].AuthorAvatarURL == "" {
+			posts[i].AuthorAvatarURL = "/assets/img/avatar-placeholder.png"
+		}
+	}
+
 	cookie, _ := cookies.Read(r)
 
 	userID, _ := strconv.ParseUint(cookie["id"], 10, 64)
@@ -108,8 +114,21 @@ func LoadProfilePage(w http.ResponseWriter, r *http.Request) {
 		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: "Failed to decode profile data"})
 		return
 	}
-	cookie, _ := cookies.Read(r)
 
+	if profileData.User.AvatarURL == "" {
+		profileData.User.AvatarURL = "/assets/img/avatar-placeholder.png"
+	}
+	if profileData.User.BannerURL == "" {
+		profileData.User.BannerURL = "/assets/img/banner-placeholder.png"
+	}
+
+	for i := range profileData.Posts {
+		if profileData.Posts[i].AuthorAvatarURL == "" {
+			profileData.Posts[i].AuthorAvatarURL = "/assets/img/avatar-placeholder.png"
+		}
+	}
+
+	cookie, _ := cookies.Read(r)
 	userID, _ := strconv.ParseUint(cookie["id"], 10, 64)
 	username, err = utils.GetLoggedUsername(r, apiURL, userID)
 	if err != nil {
