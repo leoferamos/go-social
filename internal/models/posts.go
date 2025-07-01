@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type Posts struct {
+type Post struct {
 	ID              uint64    `json:"id,omitempty"`
 	Content         string    `json:"content,omitempty"`
 	AuthorID        uint64    `json:"author_id,omitempty"`
@@ -19,19 +19,19 @@ type Posts struct {
 }
 
 // Prepare calls the methods to format and validate the post data.
-func (p *Posts) Prepare() error {
+func (p *Post) Prepare() error {
 	if err := p.validate(); err != nil {
 		return err
 	}
 	p.format()
 	return nil
 }
-func (p *Posts) validate() error {
+func (p *Post) validate() error {
 	if p.Content == "" {
 		return errors.New("content is required")
 	}
 	return nil
 }
-func (p *Posts) format() {
+func (p *Post) format() {
 	p.Content = strings.TrimSpace(p.Content)
 }

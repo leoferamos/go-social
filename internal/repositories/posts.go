@@ -16,7 +16,7 @@ func NewPostsRepository(db *sql.DB) *Posts {
 }
 
 // CreatePost creates a new post in the database.
-func (r Posts) CreatePost(post models.Posts) (uint64, error) {
+func (r Posts) CreatePost(post models.Post) (uint64, error) {
 	statement, err := r.db.Prepare(
 		"INSERT INTO posts (content, author_id) VALUES (?, ?)",
 	)
@@ -36,7 +36,7 @@ func (r Posts) CreatePost(post models.Posts) (uint64, error) {
 }
 
 // GetPost retrieves a post by its ID from the database.
-func (r Posts) GetPostByID(id uint64, userID uint64) (models.Posts, error) {
+func (r Posts) GetPostByID(id uint64, userID uint64) (models.Post, error) {
 	rows, err := r.db.Query(
 		`SELECT p.id, p.content, p.author_id, u.username, u.name,
 			COUNT(pl.user_id) AS likes, p.created_at,
@@ -52,10 +52,10 @@ func (r Posts) GetPostByID(id uint64, userID uint64) (models.Posts, error) {
 		userID, id,
 	)
 	if err != nil {
-		return models.Posts{}, err
+		return models.Post{}, err
 	}
 	defer rows.Close()
-	var post models.Posts
+	var post models.Post
 	if rows.Next() {
 		if err = rows.Scan(
 			&post.ID,
@@ -67,14 +67,14 @@ func (r Posts) GetPostByID(id uint64, userID uint64) (models.Posts, error) {
 			&post.CreatedAt,
 			&post.LikedByMe,
 		); err != nil {
-			return models.Posts{}, err
+			return models.Post{}, err
 		}
 	}
 	return post, nil
 }
 
 // GetPosts Gets the posts of people the user follows and their own posts.
-func (r Posts) GetPosts(userID uint64) ([]models.Posts, error) {
+func (r Posts) GetPosts(userID uint64) ([]models.Post, error) {
 	rows, err := r.db.Query(
 		`SELECT p.id, p.content, p.author_id, u.username, u.name,
 			COUNT(pl.user_id) AS likes, p.created_at,
@@ -94,9 +94,9 @@ func (r Posts) GetPosts(userID uint64) ([]models.Posts, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	var posts []models.Posts
+	var posts []models.Post
 	for rows.Next() {
-		var post models.Posts
+		var post models.Post
 		if err = rows.Scan(
 			&post.ID,
 			&post.Content,
@@ -115,7 +115,7 @@ func (r Posts) GetPosts(userID uint64) ([]models.Posts, error) {
 }
 
 // UpdatePost updates a post in the database.
-func (r Posts) UpdatePost(postID uint64, post models.Posts) error {
+func (r Posts) UpdatePost(postID uint64, post models.Post) error {
 	statement, err := r.db.Prepare(
 		"UPDATE posts SET content = ? WHERE id = ?",
 	)
@@ -145,7 +145,7 @@ func (r Posts) DeletePost(postID uint64) error {
 }
 
 // GetUserPosts Gets the posts of a user.
-func (r Posts) GetUserPosts(targetUserID uint64, userID uint64) ([]models.Posts, error) {
+func (r Posts) GetUserPosts(targetUserID uint64, userID uint64) ([]models.Post, error) {
 	rows, err := r.db.Query(
 		`SELECT p.id, p.content, p.author_id, u.username, u.name,
 			COUNT(pl.user_id) AS likes, p.created_at,
@@ -164,9 +164,9 @@ func (r Posts) GetUserPosts(targetUserID uint64, userID uint64) ([]models.Posts,
 		return nil, err
 	}
 	defer rows.Close()
-	var posts []models.Posts
+	var posts []models.Post
 	for rows.Next() {
-		var post models.Posts
+		var post models.Post
 		if err = rows.Scan(
 			&post.ID,
 			&post.Content,

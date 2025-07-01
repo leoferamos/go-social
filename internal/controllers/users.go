@@ -395,7 +395,7 @@ func GetProfileByUsername(w http.ResponseWriter, r *http.Request) {
 	}
 
 	postsRepo := repositories.NewPostsRepository(dbConn)
-	var posts []models.Posts
+	var posts []models.Post
 	var postsErr error
 
 	userIDFromToken, err := auth.ExtractUserID(r)

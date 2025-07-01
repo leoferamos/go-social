@@ -28,7 +28,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var post models.Posts
+	var post models.Post
 	if err = json.Unmarshal(bodyRequest, &post); err != nil {
 		responses.JSONError(w, http.StatusBadRequest, err)
 		return
@@ -147,7 +147,7 @@ func UpdatePost(w http.ResponseWriter, r *http.Request) {
 		responses.JSONError(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-	var post models.Posts
+	var post models.Post
 	if err = json.Unmarshal(bodyRequest, &post); err != nil {
 		responses.JSONError(w, http.StatusBadRequest, err)
 		return
