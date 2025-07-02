@@ -13,6 +13,12 @@ var userRoutes = []Route{
 		RequiresAuth: false,
 	},
 	{
+		URI:          "/profile/{username}",
+		Method:       http.MethodGet,
+		Function:     controllers.LoadProfilePage,
+		RequiresAuth: false,
+	},
+	{
 		URI:          "/register",
 		Method:       http.MethodPost,
 		Function:     controllers.CreateUser,
@@ -25,10 +31,10 @@ var userRoutes = []Route{
 		RequiresAuth: true,
 	},
 	{
-		URI:          "/profile/{username}",
+		URI:          "/users/{userId}",
 		Method:       http.MethodGet,
-		Function:     controllers.LoadProfilePage,
-		RequiresAuth: false,
+		Function:     controllers.GetUserByID,
+		RequiresAuth: true,
 	},
 	{
 		URI:          "/users/{userId}/follow",
