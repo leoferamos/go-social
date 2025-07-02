@@ -46,16 +46,20 @@ func (u *User) validate(context string) error {
 	if err := checkmail.ValidateFormat(u.Email); err != nil {
 		return errors.New("invalid email format")
 	}
-	if u.Password != "" {
-		if err := validatePasswordStrength(u.Password); err != nil {
-			return err
-		}
-	}
+
 	if context == "registration" {
 		if u.Password == "" {
 			return errors.New("password is required")
 		}
+		if err := ValidatePasswordStrength(u.Password); err != nil {
+			return err
+		}
 	}
+
+	if context == "update" && u.Password != "" {
+		return errors.New("password cannot be updated here; use the reset password endpoint")
+	}
+
 	return nil
 }
 
@@ -75,7 +79,7 @@ func (u *User) format(context string) error {
 	return nil
 }
 
-func validatePasswordStrength(password string) error {
+func ValidatePasswordStrength(password string) error {
 	if len(password) < 8 {
 		return errors.New("password must be at least 8 characters long")
 	}
