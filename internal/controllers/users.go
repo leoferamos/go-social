@@ -325,6 +325,10 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 		responses.JSONError(w, http.StatusBadRequest, err)
 		return
 	}
+	if err = models.ValidatePasswordStrength(password.NewPassword); err != nil {
+		responses.JSONError(w, http.StatusBadRequest, err)
+		return
+	}
 	db, err := db.Connect()
 	if err != nil {
 		responses.JSONError(w, http.StatusInternalServerError, err)
