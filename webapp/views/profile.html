@@ -92,19 +92,21 @@
             <h2>Edit Profile</h2>
             <button type="button" id="close-edit-profile" class="btn-close" aria-label="Close"></button>
         </div>
-        <form id="edit-profile-form" autocomplete="off">
-            <div class="edit-profile-avatar-banner">
+        <div class="edit-profile-banner-wrapper position-relative">
+            <img id="edit-profile-banner"
+                 src="{{ .Profile.User.BannerURL }}"
+                 alt="Banner"
+                 class="profile-banner mb-3 w-100"
+                 style="height: 160px; object-fit: cover;">
+            <div class="edit-profile-avatar-wrapper position-absolute top-100 start-50 translate-middle" style="z-index:2;">
                 <img id="edit-profile-avatar"
                      src="{{ .Profile.User.AvatarURL }}"
                      alt="Avatar"
                      class="profile-avatar mb-3"
-                     style="pointer-events:none;">
-                <img id="edit-profile-banner"
-                     src="{{ .Profile.User.BannerURL }}"
-                     alt="Banner"
-                     class="profile-banner mb-3"
-                     style="pointer-events:none;">
+                     style="width: 96px; height: 96px; border: 4px solid #222b3a; background: #222b3a; pointer-events:none;">
             </div>
+        </div>
+        <form id="edit-profile-form" autocomplete="off" class="p-3">
             <div class="mb-3">
                 <label for="edit-name" class="form-label">Name</label>
                 <input type="text" class="form-control" id="edit-name" name="name" required>
