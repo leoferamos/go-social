@@ -183,3 +183,37 @@ body {
     border-bottom-left-radius: 18px;
     border-bottom-right-radius: 18px;
 }
+
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(30, 34, 40, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+}
+.modal-edit-profile {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: #181f2a;
+    border-radius: 18px;
+    padding: 2rem 1.5rem;
+    z-index: 1001;
+    min-width: 320px;
+    max-width: 95vw;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.25);
+    color: #E7E9EA;
+}
+.edit-profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.btn-close {
+    background: none;
+    border: none;
+    color: #E7E9EA;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
