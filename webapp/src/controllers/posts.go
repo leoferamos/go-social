@@ -61,6 +61,10 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if createdPost.AuthorAvatarURL == "" {
+		createdPost.AuthorAvatarURL = "/assets/img/avatar-placeholder.png"
+	}
+
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	var buf bytes.Buffer
 	err = utils.ExecuteTemplate(&buf, "post-with-permission", createdPost)
