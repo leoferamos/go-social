@@ -89,6 +89,9 @@ body {
     align-items: center;
     margin-bottom: 0.25rem;
 }
+.post-header a {
+    text-decoration: none;
+}
 .post-author-name {
     font-weight: bold;
     color: #E7E9EA;
