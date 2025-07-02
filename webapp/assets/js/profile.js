@@ -47,3 +47,50 @@ function follow() {
         }
     });
 }
+
+$(function() {
+    $('#edit-profile-btn').on('click', function() {
+        const userId = $(this).data('user-id');
+        const defaultAvatar = "{{ .Profile.User.AvatarURL }}";
+        const defaultBanner = "{{ .Profile.User.BannerURL }}";
+
+        $.get(`/users/${userId}`, function(user) {
+            $('#edit-name').val(user.name);
+            $('#edit-username').val(user.username);
+            $('#edit-email').val(user.email);
+            $('#edit-bio').val(user.bio || '');
+
+            $('#edit-profile-avatar').attr('src', user.avatar_url || defaultAvatar);
+            $('#edit-profile-banner').attr('src', user.banner_url || defaultBanner);
+
+            $('#edit-profile-overlay, #edit-profile-modal').show();
+        });
+    });
+
+    $('#edit-profile-overlay, #close-edit-profile').on('click', function() {
+        $('#edit-profile-overlay, #edit-profile-modal').hide();
+    });
+
+    $('#edit-profile-form').on('submit', function(e) {
+        e.preventDefault();
+        const userId = $('#edit-profile-btn').data('user-id');
+        const data = {
+            name: $('#edit-name').val().trim(),
+            username: $('#edit-username').val().trim(),
+            email: $('#edit-email').val().trim(),
+            bio: $('#edit-bio').val().trim()
+        };
+        $.ajax({
+            url: `/users/${userId}`,
+            method: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function() {
+                location.reload();
+            },
+            error: function(xhr) {
+                alert(xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : 'Error updating profile.');
+            }
+        });
+    });
+});
