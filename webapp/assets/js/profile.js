@@ -74,9 +74,12 @@ $(function() {
     $('#edit-profile-form').on('submit', function(e) {
         e.preventDefault();
         const userId = $('#edit-profile-btn').data('user-id');
+        const oldUsername = "{{ index .Profile.User \"username\" }}";
+        const newUsername = $('#edit-username').val().trim();
+
         const data = {
             name: $('#edit-name').val().trim(),
-            username: $('#edit-username').val().trim(),
+            username: newUsername,
             email: $('#edit-email').val().trim(),
             bio: $('#edit-bio').val().trim()
         };
@@ -86,10 +89,22 @@ $(function() {
             contentType: 'application/json',
             data: JSON.stringify(data),
             success: function() {
-                location.reload();
+                if (oldUsername !== newUsername) {
+                    window.location.href = `/profile/${newUsername}`;
+                } else {
+                    location.reload();
+                }
             },
             error: function(xhr) {
-                alert(xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : 'Error updating profile.');
+                let msg = 'Error updating profile.';
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    if (xhr.responseJSON.error.includes('Duplicate entry') && xhr.responseJSON.error.includes('username')) {
+                        msg = 'This username is already taken. Please choose another one.';
+                    } else {
+                        msg = xhr.responseJSON.error;
+                    }
+                }
+                Swal.fire("Oops...", msg, "error");
             }
         });
     });
