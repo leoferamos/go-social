@@ -19,6 +19,12 @@ var userRoutes = []Route{
 		RequiresAuth: false,
 	},
 	{
+		URI:          "/users/{userId}",
+		Method:       http.MethodPut,
+		Function:     controllers.UpdateUser,
+		RequiresAuth: true,
+	},
+	{
 		URI:          "/profile/{username}",
 		Method:       http.MethodGet,
 		Function:     controllers.LoadProfilePage,
