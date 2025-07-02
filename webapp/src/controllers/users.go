@@ -126,6 +126,46 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusOK, map[string]string{"message": "User updated successfully"})
 }
 
+// GetUserByID retrieves a user by their ID.
+func GetUserByID(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userID := vars["userId"]
+
+	apiURL := os.Getenv("API_URL")
+	if apiURL == "" {
+		apiURL = "http://api:5000"
+	}
+
+	getURL := apiURL + "/users/" + userID
+
+	response, err := requests.MakeAuthenticatedRequest(r, http.MethodGet, getURL, nil)
+	if err != nil {
+		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: "Failed to get user"})
+		return
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode >= 400 {
+		responses.HandleStatusCode(w, response)
+		return
+	}
+
+	var user models.User
+	if err := json.NewDecoder(response.Body).Decode(&user); err != nil {
+		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: "Failed to decode user data"})
+		return
+	}
+
+	if user.AvatarURL == "" {
+		user.AvatarURL = "/assets/img/avatar-placeholder.png"
+	}
+	if user.BannerURL == "" {
+		user.BannerURL = "/assets/img/banner-placeholder.png"
+	}
+
+	responses.JSON(w, http.StatusOK, user)
+}
+
 // FollowUser calls the API to follow a user.
 func FollowUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
