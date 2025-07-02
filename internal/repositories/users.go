@@ -152,8 +152,6 @@ func (repository *users) GetUserByEmail(email string) (models.User, error) {
 	return user, nil
 }
 
-//
-
 // FollowUser allows a user to follow another user
 func (repository *users) FollowUser(userID, followerID uint64) error {
 	statement, err := repository.db.Prepare(
