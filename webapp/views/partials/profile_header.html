@@ -1,0 +1,21 @@
+{{ define "profile_header" }}
+<div class="profile-header d-flex justify-content-between align-items-start px-4 pt-2">
+    <div class="profile-header-info">
+        <h2 class="profile-name mb-0 d-flex align-items-center">
+            {{ index .Profile.User.Name }}
+        </h2>
+        <span class="profile-username">@{{ index .Profile.User.Username }}</span>
+    </div>
+    <div class="profile-header-action">
+        {{ if eq .UserID .Profile.User.ID}}
+            <button id="edit-profile-btn" class="btn btn-outline-primary" data-user-id="{{ .Profile.User.ID }}">Edit Profile</button>
+        {{ else }}
+            <button class="btn btn-primary btn-sm" id="follow-btn"
+                    data-is-following="{{.Profile.IsFollowing}}"
+                    data-user-id="{{.Profile.User.ID}}">
+                Follow
+            </button>
+        {{ end }}
+    </div>
+</div>
+{{ end }}

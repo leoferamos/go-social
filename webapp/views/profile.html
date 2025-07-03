@@ -14,142 +14,18 @@
     <div class="container mt-4">
         <div class="row justify-content-center">
             <div class="col-12 col-md-8 col-lg-6 main-column-border">
-                <div class="profile-banner position-relative">
-                    <img src="{{ .Profile.User.BannerURL }}" alt="Banner" class="profile-banner-img">
-                    <div class="profile-avatar-wrapper">
-                        <img src="{{ .Profile.User.AvatarURL }}" alt="Avatar" class="profile-avatar">
-                    </div>
-                </div>
-                <div class="profile-header d-flex justify-content-between align-items-start px-4 pt-2">
-                    <div class="profile-header-info">
-                        <h2 class="profile-name mb-0 d-flex align-items-center">
-                            {{ index .Profile.User.Name }}
-                        </h2>
-                        <span class="profile-username">@{{ index .Profile.User.Username }}</span>
-                    </div>
-                    <div class="profile-header-action">
-                        {{ if eq .UserID .Profile.User.ID}}
-                            <button id="edit-profile-btn" class="btn btn-outline-primary" data-user-id="{{ .Profile.User.ID }}">Edit Profile</button>
-                        {{ else }}
-                            <button class="btn btn-primary btn-sm" id="follow-btn"
-                                    data-is-following="{{.Profile.IsFollowing}}"
-                                    data-user-id="{{.Profile.User.ID}}">
-                                Follow
-                            </button>
-                        {{ end }}
-                    </div>
-                </div>
-                <div class="profile-body px-4 pb-0 pt-2">
-                    <div class="profile-bio mt-2">{{ .Profile.User.Bio }}</div>
-                    <div class="profile-links mt-1">
-                    </div>
-                    <div class="profile-meta mt-2 d-flex flex-wrap gap-3">
-                        <span><i class="bi bi-calendar3"></i> Joined <span id="profile-join-date">{{ index .Profile.User.CreatedAt }}</span></span>
-                    </div>
-                    <div class="profile-stats mt-3 d-flex gap-4">
-                        <span>
-                            <button type="button" id="show-following" data-user-id="{{ .Profile.User.ID }}" class="profile-stat-btn">
-                                {{ .Profile.User.Following }}
-                            </button>
-                            <span class="stat-label">Following</span>
-                        </span>
-                        <span>
-                            <button type="button" id="show-followers" data-user-id="{{ .Profile.User.ID }}" class="profile-stat-btn">
-                                {{ .Profile.User.Followers }}
-                            </button>
-                            <span class="stat-label">Followers</span>
-                        </span>
-                    </div>
-                </div>
-                <div class="profile-tabs mt-4 px-4">
-                    <ul class="nav nav-tabs border-0">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="#">Posts</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link disabled" href="#">Replies</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link disabled" href="#">Media</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link disabled" href="#">Likes</a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="profile-posts px-4 pb-4">
-                    <section id="profile-posts">
-                        {{ range .Profile.Posts }}
-                            {{ if eq .AuthorID $.UserID }}
-                                {{ template "post-with-permission" . }}
-                            {{ else }}
-                                {{ template "post-without-permission" . }}
-                            {{ end }}
-                        {{ else }}
-                            {{ template "no-posts-message" . }}
-                        {{ end }}
-                    </section>
-                </div>
+                {{ template "profile_banner" . }}
+                {{ template "profile_header" . }}
+                {{ template "profile_body" . }}
+                {{ template "create_post_form" . }}
+                {{ template "no_posts_message" . }}
+                {{ template "loading_indicator" . }}
             </div>
         </div>
     </div>
 
-
-    <div id="edit-profile-overlay" class="modal-overlay" style="display:none;"></div>
-
-    <div id="edit-profile-modal" class="modal-edit-profile" style="display:none;">
-        <div class="edit-profile-header">
-            <h2>Edit Profile</h2>
-            <button type="button" id="close-edit-profile" class="btn-close" aria-label="Close"></button>
-        </div>
-        <div class="edit-profile-banner-wrapper position-relative">
-            <img id="edit-profile-banner"
-                 src="{{ .Profile.User.BannerURL }}"
-                 alt="Banner"
-                 class="profile-banner mb-3 w-100"
-                 style="height: 160px; object-fit: cover;">
-            <div class="edit-profile-avatar-wrapper position-absolute top-100 start-50 translate-middle" style="z-index:2;">
-                <img id="edit-profile-avatar"
-                     src="{{ .Profile.User.AvatarURL }}"
-                     alt="Avatar"
-                     class="profile-avatar mb-3"
-                     style="width: 96px; height: 96px; border: 4px solid #222b3a; background: #222b3a; pointer-events:none;">
-            </div>
-        </div>
-        <form id="edit-profile-form" autocomplete="off" class="p-3">
-            <div class="mb-3">
-                <label for="edit-name" class="form-label">Name</label>
-                <input type="text" class="form-control" id="edit-name" name="name" required>
-            </div>
-            <div class="mb-3">
-                <label for="edit-username" class="form-label">Username</label>
-                <input type="text" class="form-control" id="edit-username" name="username" required>
-            </div>
-            <div class="mb-3">
-                <label for="edit-email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="edit-email" name="email" required readonly>
-            </div>
-            <div class="mb-3">
-                <label for="edit-bio" class="form-label">Bio</label>
-                <textarea class="form-control" id="edit-bio" name="bio" rows="2"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Save Changes</button>
-        </form>
-    </div>
-
-  
-    <div id="followers-modal-overlay" class="modal-overlay" style="display:none;"></div>
-
-    <div id="followers-modal" class="modal-edit-profile" style="display:none;">
-        <div class="edit-profile-header">
-            <h2 id="followers-modal-title">Followers</h2>
-            <button type="button" id="close-followers-modal" class="btn-close" aria-label="Close"></button>
-        </div>
-        <div id="followers-modal-content" style="max-height: 350px; overflow-y: auto;">
-
-        </div>
-    </div>
-
+    {{ template "edit_profile_modal" . }}
+    {{ template "followers_modal" . }}
     {{ template "scripts" . }}
     {{ template "delete_post_modal" . }}
     <script>
@@ -157,7 +33,6 @@
     const joinDateElem = document.getElementById('profile-join-date');
     if (joinDateElem) {
         const raw = joinDateElem.textContent;
-        // Try to parse as ISO, fallback to raw
         let date = new Date(raw);
         if (isNaN(date) && /\d{4}-\d{2}-\d{2}/.test(raw)) {
             date = new Date(raw + 'T00:00:00Z');
@@ -169,7 +44,6 @@
             joinDateElem.textContent = raw;
         }
     }
-    // Format post dates (profile page)
     document.querySelectorAll('.post-time').forEach(function(span) {
         const iso = span.getAttribute('data-time');
         if (iso) {

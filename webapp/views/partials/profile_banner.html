@@ -1,0 +1,8 @@
+{{ define "profile_banner" }}
+<div class="profile-banner position-relative">
+    <img src="{{ .Profile.User.BannerURL }}" alt="Banner" class="profile-banner-img">
+    <div class="profile-avatar-wrapper">
+        <img src="{{ .Profile.User.AvatarURL }}" alt="Avatar" class="profile-avatar">
+    </div>
+</div>
+{{ end }}

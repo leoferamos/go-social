@@ -1,0 +1,52 @@
+{{ define "profile_body" }}
+<div class="profile-body px-4 pb-0 pt-2">
+    <div class="profile-bio mt-2">{{ .Profile.User.Bio }}</div>
+    <div class="profile-links mt-1"></div>
+    <div class="profile-meta mt-2 d-flex flex-wrap gap-3">
+        <span><i class="bi bi-calendar3"></i> Joined <span id="profile-join-date">{{ index .Profile.User.CreatedAt }}</span></span>
+    </div>
+    <div class="profile-stats mt-3 d-flex gap-4">
+        <span>
+            <button type="button" id="show-following" data-user-id="{{ .Profile.User.ID }}" class="profile-stat-btn">
+                {{ .Profile.User.Following }}
+            </button>
+            <span class="stat-label">Following</span>
+        </span>
+        <span>
+            <button type="button" id="show-followers" data-user-id="{{ .Profile.User.ID }}" class="profile-stat-btn">
+                {{ .Profile.User.Followers }}
+            </button>
+            <span class="stat-label">Followers</span>
+        </span>
+    </div>
+    <div class="profile-tabs mt-4 px-4">
+        <ul class="nav nav-tabs border-0">
+            <li class="nav-item">
+                <a class="nav-link active" href="#">Posts</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link disabled" href="#">Replies</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link disabled" href="#">Media</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link disabled" href="#">Likes</a>
+            </li>
+        </ul>
+    </div>
+    <div class="profile-posts px-4 pb-4">
+        <section id="profile-posts">
+            {{ range .Profile.Posts }}
+                {{ if eq .AuthorID $.UserID }}
+                    {{ template "post-with-permission" . }}
+                {{ else }}
+                    {{ template "post-without-permission" . }}
+                {{ end }}
+            {{ else }}
+                {{ template "no-posts-message" . }}
+            {{ end }}
+        </section>
+    </div>
+</div>
+{{ end }}
