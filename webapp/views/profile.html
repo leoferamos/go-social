@@ -21,6 +21,9 @@
                 {{ template "edit_profile_modal" . }}
                 {{ template "followers_modal" . }}
                 {{ template "delete_post_modal" . }}
+                <div id="no-posts-message-template" style="display: none;">
+                    {{ template "no_posts_message" . }}
+                </div>
             </div>
         </div>
     </div>
