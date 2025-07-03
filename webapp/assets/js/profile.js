@@ -49,6 +49,7 @@ function follow() {
 }
 
 $(function() {
+
     $('#edit-profile-btn').on('click', function() {
         const userId = $(this).data('user-id');
         const defaultAvatar = "{{ .Profile.User.AvatarURL }}";
@@ -63,12 +64,13 @@ $(function() {
             $('#edit-profile-avatar').attr('src', user.avatar_url || defaultAvatar);
             $('#edit-profile-banner').attr('src', user.banner_url || defaultBanner);
 
-            $('#edit-profile-overlay, #edit-profile-modal').show();
+            $('#edit-profile-overlay, #edit-profile-modal').fadeIn(150); 
         });
     });
 
+
     $('#edit-profile-overlay, #close-edit-profile').on('click', function() {
-        $('#edit-profile-overlay, #edit-profile-modal').hide();
+        $('#edit-profile-overlay, #edit-profile-modal').fadeOut(150); 
     });
 
     $('#edit-profile-form').on('submit', function(e) {
@@ -108,4 +110,58 @@ $(function() {
             }
         });
     });
+
+    $('#show-followers').on('click', function(e) {
+        e.preventDefault();
+        const userId = $(this).data('user-id');
+        $('#followers-modal-title').text('Followers');
+        $('#followers-modal-content').html('<div class="text-center my-4"><div class="spinner-border"></div></div>');
+        $('#followers-modal-overlay, #followers-modal').fadeIn(150);
+
+        $.get(`/users/${userId}/followers`, function(followers) {
+            renderFollowersList(followers);
+        }).fail(function() {
+            $('#followers-modal-content').html('<div class="text-danger text-center my-4">Failed to load followers.</div>');
+        });
+    });
+
+
+    $('#show-following').on('click', function(e) {
+        e.preventDefault();
+        const userId = $(this).data('user-id');
+        $('#followers-modal-title').text('Following');
+        $('#followers-modal-content').html('<div class="text-center my-4"><div class="spinner-border"></div></div>');
+        $('#followers-modal-overlay, #followers-modal').fadeIn(150);
+
+        $.get(`/users/${userId}/following`, function(following) {
+            renderFollowersList(following);
+        }).fail(function() {
+            $('#followers-modal-content').html('<div class="text-danger text-center my-4">Failed to load following.</div>');
+        });
+    });
+
+    $('#followers-modal-overlay, #close-followers-modal').on('click', function() {
+        $('#followers-modal-overlay, #followers-modal').fadeOut(150);
+    });
+
+    function renderFollowersList(users) {
+        if (!users.length) {
+            $('#followers-modal-content').html('<div class="text-center my-4 text-muted">No users found.</div>');
+            return;
+        }
+        let html = '<ul class="list-group list-group-flush">';
+        users.forEach(function(user) {
+            html += `
+                <li class="list-group-item d-flex align-items-center gap-3">
+                    <img src="${user.avatar_url || user.AvatarURL || '/assets/img/avatar-placeholder.png'}" alt="Avatar" class="rounded-circle" style="width:40px;height:40px;object-fit:cover;">
+                    <div>
+                        <div><b>${user.name || user.Name}</b></div>
+                        <div class="text-muted small">@${user.username || user.Username}</div>
+                    </div>
+                </li>
+            `;
+        });
+        html += '</ul>';
+        $('#followers-modal-content').html(html);
+    }
 });
