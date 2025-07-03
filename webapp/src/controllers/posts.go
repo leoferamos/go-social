@@ -67,7 +67,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	var buf bytes.Buffer
-	err = utils.ExecuteTemplate(&buf, "post-with-permission", createdPost)
+	err = utils.ExecuteTemplate(&buf, "post_with_permission", createdPost)
 	if err != nil {
 		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: "Failed to render post template"})
 		return
