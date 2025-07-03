@@ -7,16 +7,20 @@
     </div>
     <div class="profile-stats mt-3 d-flex gap-4">
         <span>
-            <button type="button" id="show-following" data-user-id="{{ .Profile.User.ID }}" class="profile-stat-btn">
+            <button type="button" class="profile-stat-btn show-following" data-user-id="{{ .Profile.User.ID }}">
                 {{ .Profile.User.Following }}
             </button>
-            <span class="stat-label">Following</span>
+            <button type="button" class="stat-label profile-stat-btn show-following" data-user-id="{{ .Profile.User.ID }}">
+                Following
+            </button>
         </span>
         <span>
-            <button type="button" id="show-followers" data-user-id="{{ .Profile.User.ID }}" class="profile-stat-btn">
+            <button type="button" class="profile-stat-btn show-followers" data-user-id="{{ .Profile.User.ID }}">
                 {{ .Profile.User.Followers }}
             </button>
-            <span class="stat-label">Followers</span>
+            <button type="button" class="stat-label profile-stat-btn show-followers" data-user-id="{{ .Profile.User.ID }}">
+                Followers
+            </button>
         </span>
     </div>
     <div class="profile-tabs mt-4 px-4">

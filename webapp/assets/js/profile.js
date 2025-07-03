@@ -111,7 +111,7 @@ $(function() {
         });
     });
 
-    $('#show-followers').on('click', function(e) {
+    $('.show-followers').on('click', function(e) {
         e.preventDefault();
         const userId = $(this).data('user-id');
         $('#followers-modal-title').text('Followers');
@@ -126,7 +126,7 @@ $(function() {
     });
 
 
-    $('#show-following').on('click', function(e) {
+    $('.show-following').on('click', function(e) {
         e.preventDefault();
         const userId = $(this).data('user-id');
         $('#followers-modal-title').text('Following');
@@ -164,4 +164,4 @@ $(function() {
         html += '</ul>';
         $('#followers-modal-content').html(html);
     }
-});
+}); 
