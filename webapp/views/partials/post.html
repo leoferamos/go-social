@@ -1,4 +1,4 @@
-{{ define "post-header" }}
+{{ define "post_header" }}
 <header class="post-header">
     <a href="/profile/{{ .AuthorUsername }}">
         <span class="post-author-name">{{ .AuthorName }}</span>
@@ -8,20 +8,20 @@
 </header>
 {{ end }}
 
-{{ define "post-likes" }}
+{{ define "post_likes" }}
 <div>
     <i class="bi like-post {{ if .LikedByMe }}bi-heart-fill text-danger{{ else }}bi-heart{{ end }}" style="cursor: pointer;"></i> <span>{{ .Likes }}</span>
 </div>
 {{ end }}
 
-{{ define "post-with-permission" }}
+{{ define "post_with_permission" }}
 <article class="feed-post" data-post-id="{{ .ID }}">
     <a href="/profile/{{ .AuthorUsername }}">
         <img class="profile-avatar post-avatar" src="{{ .AuthorAvatarURL }}" alt="Avatar" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
     </a>
     <div class="post-content-area">
         <div class="d-flex justify-content-between align-items-start">
-            {{ template "post-header" . }}
+            {{ template "post_header" . }}
             <div class="dropdown">
                 <button class="btn btn-link p-0 text-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="bi bi-three-dots"></i>
@@ -37,20 +37,20 @@
         </div>
         <p class="post-text">{{ .Content }}</p>
         <footer class="post-actions">
-            {{ template "post-likes" . }}
+            {{ template "post_likes" . }}
         </footer>
     </div>
 </article>
 {{ end }}
 
-{{ define "post-without-permission" }}
+{{ define "post_without_permission" }}
 <article class="feed-post" data-post-id="{{ .ID }}">
     <a href="/profile/{{ .AuthorUsername }}">
         <img class="profile-avatar post-avatar" src="{{ .AuthorAvatarURL }}" alt="Avatar" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
     </a>
     <div class="post-content-area">
         <div class="d-flex justify-content-between align-items-start">
-            {{ template "post-header" . }}
+            {{ template "post_header" . }}
             <div class="dropdown">
                 <button class="btn btn-link p-0 text-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="bi bi-three-dots"></i>
@@ -59,7 +59,7 @@
         </div>
         <p class="post-text">{{ .Content }}</p>
         <footer class="post-actions">
-            {{ template "post-likes" . }}
+            {{ template "post_likes" . }}
         </footer>
     </div>
 </article>

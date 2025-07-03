@@ -39,12 +39,12 @@
         <section id="profile-posts">
             {{ range .Profile.Posts }}
                 {{ if eq .AuthorID $.UserID }}
-                    {{ template "post-with-permission" . }}
+                    {{ template "post_with_permission" . }}
                 {{ else }}
-                    {{ template "post-without-permission" . }}
+                    {{ template "post_without_permission" . }}
                 {{ end }}
             {{ else }}
-                {{ template "no-posts-message" . }}
+                {{ template "no_posts_message" . }}
             {{ end }}
         </section>
     </div>

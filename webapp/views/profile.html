@@ -17,17 +17,15 @@
                 {{ template "profile_banner" . }}
                 {{ template "profile_header" . }}
                 {{ template "profile_body" . }}
-                {{ template "create_post_form" . }}
-                {{ template "no_posts_message" . }}
                 {{ template "loading_indicator" . }}
+                {{ template "edit_profile_modal" . }}
+                {{ template "followers_modal" . }}
+                {{ template "delete_post_modal" . }}
             </div>
         </div>
     </div>
 
-    {{ template "edit_profile_modal" . }}
-    {{ template "followers_modal" . }}
     {{ template "scripts" . }}
-    {{ template "delete_post_modal" . }}
     <script>
     // Format join date
     const joinDateElem = document.getElementById('profile-join-date');
