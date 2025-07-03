@@ -28,7 +28,7 @@ $(document).ready(function() {
                     try {
                         const resp = JSON.parse(xhr.responseText);
                         if (resp && resp.error) {
-                            msg = 'Erro: ' + resp.error;
+                            msg = 'Error: ' + resp.error;
                         }
                     } catch (e) {
                         msg = 'HTTP ' + xhr.status + ': ' + xhr.statusText + '\n' + xhr.responseText;
@@ -90,6 +90,9 @@ $(document).ready(function() {
                 deleteModal.hide();
                 if ($('#feed-posts .feed-post').length === 0) {
                     $('#feed-posts').append($('#no-posts-message-template').html());
+                }
+                if ($('#profile-posts .feed-post').length === 0) {
+                    $('#profile-posts').append($('#no-posts-message-template').html());
                 }
             },
             error: function(xhr) {
