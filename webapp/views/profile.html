@@ -47,8 +47,18 @@
                         <span><i class="bi bi-calendar3"></i> Joined <span id="profile-join-date">{{ index .Profile.User.CreatedAt }}</span></span>
                     </div>
                     <div class="profile-stats mt-3 d-flex gap-4">
-                        <span><b>{{ .Profile.User.Following }}</b> <span class="stat-label">Following</span></span>
-                        <span><b>{{ .Profile.User.Followers }}</b> <span class="stat-label">Followers</span></span>
+                        <span>
+                            <button type="button" id="show-following" data-user-id="{{ .Profile.User.ID }}" class="profile-stat-btn">
+                                {{ .Profile.User.Following }}
+                            </button>
+                            <span class="stat-label">Following</span>
+                        </span>
+                        <span>
+                            <button type="button" id="show-followers" data-user-id="{{ .Profile.User.ID }}" class="profile-stat-btn">
+                                {{ .Profile.User.Followers }}
+                            </button>
+                            <span class="stat-label">Followers</span>
+                        </span>
                     </div>
                 </div>
                 <div class="profile-tabs mt-4 px-4">
@@ -125,6 +135,19 @@
             </div>
             <button type="submit" class="btn btn-primary w-100">Save Changes</button>
         </form>
+    </div>
+
+  
+    <div id="followers-modal-overlay" class="modal-overlay" style="display:none;"></div>
+
+    <div id="followers-modal" class="modal-edit-profile" style="display:none;">
+        <div class="edit-profile-header">
+            <h2 id="followers-modal-title">Followers</h2>
+            <button type="button" id="close-followers-modal" class="btn-close" aria-label="Close"></button>
+        </div>
+        <div id="followers-modal-content" style="max-height: 350px; overflow-y: auto;">
+
+        </div>
     </div>
 
     {{ template "scripts" . }}
