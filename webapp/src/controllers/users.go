@@ -217,3 +217,69 @@ func UnfollowUser(w http.ResponseWriter, r *http.Request) {
 
 	responses.JSON(w, http.StatusOK, map[string]bool{"following": false})
 }
+
+// GetFollowers retrieves the followers of a user.
+func GetFollowers(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userID := vars["userId"]
+
+	apiURL := os.Getenv("API_URL")
+	if apiURL == "" {
+		apiURL = "http://api:5000"
+	}
+
+	getFollowersURL := apiURL + "/users/" + userID + "/followers"
+
+	response, err := requests.MakeAuthenticatedRequest(r, http.MethodGet, getFollowersURL, nil)
+	if err != nil {
+		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: "Failed to get followers"})
+		return
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode >= 400 {
+		responses.HandleStatusCode(w, response)
+		return
+	}
+
+	var followers []models.User
+	if err := json.NewDecoder(response.Body).Decode(&followers); err != nil {
+		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: "Failed to decode followers"})
+		return
+	}
+
+	responses.JSON(w, http.StatusOK, followers)
+}
+
+// GetFollowing retrieves the users that a user is following.
+func GetFollowing(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userID := vars["userId"]
+
+	apiURL := os.Getenv("API_URL")
+	if apiURL == "" {
+		apiURL = "http://api:5000"
+	}
+
+	getFollowingURL := apiURL + "/users/" + userID + "/following"
+
+	response, err := requests.MakeAuthenticatedRequest(r, http.MethodGet, getFollowingURL, nil)
+	if err != nil {
+		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: "Failed to get following"})
+		return
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode >= 400 {
+		responses.HandleStatusCode(w, response)
+		return
+	}
+
+	var following []models.User
+	if err := json.NewDecoder(response.Body).Decode(&following); err != nil {
+		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: "Failed to decode following"})
+		return
+	}
+
+	responses.JSON(w, http.StatusOK, following)
+}
