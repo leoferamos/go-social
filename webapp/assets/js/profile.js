@@ -1,82 +1,72 @@
-$(document).ready(function() {
-    const $btn = $('#follow-btn');
-    if ($btn.length) {
-        const isFollowing = Boolean($btn.data('is-following'));
+$(function () {
+    const $editProfileModal = $('#edit-profile-modal');
+    const $editProfileOverlay = $('#edit-profile-overlay');
+    const $followersModal = $('#followers-modal');
+    const $followersOverlay = $('#followers-modal-overlay');
+    const $followersModalTitle = $('#followers-modal-title');
+    const $followersModalContent = $('#followers-modal-content');
+    const $editProfileBtn = $('#edit-profile-btn');
+    const $editProfileForm = $('#edit-profile-form');
+    const $followBtn = $('#follow-btn');
+
+    // FOLLOW/UNFOLLOW BUTTON
+    if ($followBtn.length) {
+        updateFollowBtn($followBtn, Boolean($followBtn.data('is-following')));
+
+        $followBtn.on('click', function () {
+            const userId = $followBtn.data('user-id');
+            const isFollowing = $followBtn.hasClass('following');
+
+            $.ajax({
+                url: isFollowing ? `/users/${userId}/unfollow` : `/users/${userId}/follow`,
+                method: 'POST',
+                success: function (data) {
+                    updateFollowBtn($followBtn, data.following);
+                },
+                error: function (xhr) {
+                    showError(xhr, 'An error occurred while trying to follow/unfollow.');
+                }
+            });
+        });
+    }
+
+    function updateFollowBtn($btn, isFollowing) {
         if (isFollowing) {
-            $btn
-                .addClass('following btn-outline-primary')
+            $btn.addClass('following btn-outline-primary')
                 .removeClass('btn-primary')
                 .text('Unfollow');
         } else {
-            $btn
-                .removeClass('following btn-outline-primary')
+            $btn.removeClass('following btn-outline-primary')
                 .addClass('btn-primary')
                 .text('Follow');
         }
     }
-    $btn.on('click', follow);
-});
 
-function follow() {
-    const $btn = $(this);
-    const userId = $btn.data('user-id');
-    const isFollowing = $btn.hasClass('following');
-
-    $.ajax({
-        url: isFollowing ? `/users/${userId}/unfollow` : `/users/${userId}/follow`,
-        method: 'POST',
-        success: function(data) {
-            if (data.following) {
-                $btn
-                    .addClass('following btn-outline-primary')
-                    .removeClass('btn-primary')
-                    .text('Unfollow');
-            } else {
-                $btn
-                    .removeClass('following btn-outline-primary')
-                    .addClass('btn-primary')
-                    .text('Follow');
-            }
-        },
-        error: function(xhr) {
-            let msg = 'An error occurred while trying to follow/unfollow.';
-            if (xhr.responseJSON && xhr.responseJSON.error) {
-                msg = xhr.responseJSON.error;
-            }
-            Swal.fire("Oops...", msg, "error");
-        }
-    });
-}
-
-$(function() {
-
-    $('#edit-profile-btn').on('click', function() {
+    // EDIT PROFILE MODAL
+    $editProfileBtn.on('click', function () {
         const userId = $(this).data('user-id');
-        const defaultAvatar = "{{ .Profile.User.AvatarURL }}";
-        const defaultBanner = "{{ .Profile.User.BannerURL }}";
+        const defaultAvatar = $editProfileBtn.data('avatar-url') || '/assets/img/avatar-placeholder.png';
+        const defaultBanner = $editProfileBtn.data('banner-url') || '/assets/img/banner-placeholder.png';
 
-        $.get(`/users/${userId}`, function(user) {
+        $.get(`/users/${userId}`, function (user) {
             $('#edit-name').val(user.name);
             $('#edit-username').val(user.username);
             $('#edit-email').val(user.email);
             $('#edit-bio').val(user.bio || '');
-
             $('#edit-profile-avatar').attr('src', user.avatar_url || defaultAvatar);
             $('#edit-profile-banner').attr('src', user.banner_url || defaultBanner);
-
-            $('#edit-profile-overlay, #edit-profile-modal').fadeIn(150); 
+            $editProfileOverlay.add($editProfileModal).fadeIn(150);
         });
     });
 
-
-    $('#edit-profile-overlay, #close-edit-profile').on('click', function() {
-        $('#edit-profile-overlay, #edit-profile-modal').fadeOut(150); 
+    $editProfileOverlay.add('#close-edit-profile').on('click', function () {
+        $editProfileOverlay.add($editProfileModal).fadeOut(150);
     });
 
-    $('#edit-profile-form').on('submit', function(e) {
+    $editProfileForm.on('submit', function (e) {
         e.preventDefault();
-        const userId = $('#edit-profile-btn').data('user-id');
-        const oldUsername = "{{ index .Profile.User \"username\" }}";
+        const userId = $editProfileBtn.data('user-id');
+        const oldUsername = $editProfileBtn.data('username');
         const newUsername = $('#edit-username').val().trim();
 
         const data = {
@@ -85,19 +75,20 @@ $(function() {
             email: $('#edit-email').val().trim(),
             bio: $('#edit-bio').val().trim()
         };
+
         $.ajax({
             url: `/users/${userId}`,
             method: 'PUT',
             contentType: 'application/json',
             data: JSON.stringify(data),
-            success: function() {
+            success: function () {
                 if (oldUsername !== newUsername) {
                     window.location.href = `/profile/${newUsername}`;
                 } else {
                     location.reload();
                 }
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 let msg = 'Error updating profile.';
                 if (xhr.responseJSON && xhr.responseJSON.error) {
                     if (xhr.responseJSON.error.includes('Duplicate entry') && xhr.responseJSON.error.includes('username')) {
@@ -111,57 +102,70 @@ $(function() {
         });
     });
 
-    $('.show-followers').on('click', function(e) {
+    // FOLLOWERS / FOLLOWING MODALS
+    $(document).on('click', '.show-followers', function (e) {
         e.preventDefault();
         const userId = $(this).data('user-id');
-        $('#followers-modal-title').text('Followers');
-        $('#followers-modal-content').html('<div class="text-center my-4"><div class="spinner-border"></div></div>');
-        $('#followers-modal-overlay, #followers-modal').fadeIn(150);
+        $followersModalTitle.text('Followers');
+        showModalLoading();
+        $followersOverlay.add($followersModal).fadeIn(150);
 
-        $.get(`/users/${userId}/followers`, function(followers) {
-            renderFollowersList(followers);
-        }).fail(function() {
-            $('#followers-modal-content').html('<div class="text-danger text-center my-4">Failed to load followers.</div>');
+        $.get(`/users/${userId}/followers`, function(users) {
+            renderFollowersList(users, "This user has no followers yet.");
+        }).fail(function () {
+            showModalError('Failed to load followers.');
         });
     });
 
-
-    $('.show-following').on('click', function(e) {
+    $(document).on('click', '.show-following', function (e) {
         e.preventDefault();
         const userId = $(this).data('user-id');
-        $('#followers-modal-title').text('Following');
-        $('#followers-modal-content').html('<div class="text-center my-4"><div class="spinner-border"></div></div>');
-        $('#followers-modal-overlay, #followers-modal').fadeIn(150);
+        $followersModalTitle.text('Following');
+        showModalLoading();
+        $followersOverlay.add($followersModal).fadeIn(150);
 
-        $.get(`/users/${userId}/following`, function(following) {
-            renderFollowersList(following);
-        }).fail(function() {
-            $('#followers-modal-content').html('<div class="text-danger text-center my-4">Failed to load following.</div>');
+        $.get(`/users/${userId}/following`, function(users) {
+            renderFollowersList(users, "This user is not following anyone yet.");
+        }).fail(function () {
+            showModalError('Failed to load following.');
         });
     });
 
-    $('#followers-modal-overlay, #close-followers-modal').on('click', function() {
-        $('#followers-modal-overlay, #followers-modal').fadeOut(150);
+    $followersOverlay.add('#close-followers-modal').on('click', function () {
+        $followersOverlay.add($followersModal).fadeOut(150);
     });
 
-    function renderFollowersList(users) {
-        if (!users.length) {
-            $('#followers-modal-content').html('<div class="text-center my-4 text-muted">No users found.</div>');
+    // UTILS
+    function renderFollowersList(users, emptyMsg) {
+        if (!Array.isArray(users) || !users.length) {
+            $followersModalContent.html(`<div class="text-center my-4" style="color: #E7E9EA;">${emptyMsg}</div>`);
             return;
         }
-        let html = '<ul class="list-group list-group-flush">';
-        users.forEach(function(user) {
-            html += `
-                <li class="list-group-item d-flex align-items-center gap-3">
-                    <img src="${user.avatar_url || user.AvatarURL || '/assets/img/avatar-placeholder.png'}" alt="Avatar" class="rounded-circle" style="width:40px;height:40px;object-fit:cover;">
-                    <div>
-                        <div><b>${user.name || user.Name}</b></div>
-                        <div class="text-muted small">@${user.username || user.Username}</div>
-                    </div>
-                </li>
-            `;
-        });
-        html += '</ul>';
-        $('#followers-modal-content').html(html);
+        const html = users.map(user => `
+            <li class="list-group-item d-flex align-items-center gap-3">
+                <img src="${user.avatar_url || user.AvatarURL || '/assets/img/avatar-placeholder.png'}" alt="Avatar" class="rounded-circle" style="width:40px;height:40px;object-fit:cover;">
+                <div>
+                    <div><b>${user.name || user.Name}</b></div>
+                    <div class="text-muted small">@${user.username || user.Username}</div>
+                </div>
+            </li>
+        `).join('');
+        $followersModalContent.html(`<ul class="list-group list-group-flush">${html}</ul>`);
     }
-}); 
+
+    function showModalLoading() {
+        $followersModalContent.html('<div class="text-center my-4"><div class="spinner-border"></div></div>');
+    }
+
+    function showModalError(msg) {
+        $followersModalContent.html(`<div class="text-danger text-center my-4">${msg}</div>`);
+    }
+
+    function showError(xhr, defaultMsg) {
+        let msg = defaultMsg;
+        if (xhr.responseJSON && xhr.responseJSON.error) {
+            msg = xhr.responseJSON.error;
+        }
+        Swal.fire("Oops...", msg, "error");
+    }
+});
