@@ -141,15 +141,24 @@ $(function () {
             $followersModalContent.html(`<div class="text-center my-4" style="color: #E7E9EA;">${emptyMsg}</div>`);
             return;
         }
-        const html = users.map(user => `
-            <li class="list-group-item d-flex align-items-center gap-3">
-                <img src="${user.avatar_url || user.AvatarURL || '/assets/img/avatar-placeholder.png'}" alt="Avatar" class="rounded-circle" style="width:40px;height:40px;object-fit:cover;">
-                <div>
-                    <div><b>${user.name || user.Name}</b></div>
-                    <div class="text-muted small">@${user.username || user.Username}</div>
-                </div>
-            </li>
-        `).join('');
+        const html = users.map(user => {
+            const username = user.username || user.Username;
+            const name = user.name || user.Name;
+            const avatar = user.avatar_url || user.AvatarURL || '/assets/img/avatar-placeholder.png';
+            return `
+                <li class="list-group-item d-flex align-items-center gap-3">
+                    <a href="/profile/${username}">
+                        <img src="${avatar}" alt="Avatar" class="rounded-circle" style="width:40px;height:40px;object-fit:cover;">
+                    </a>
+                    <div>
+                        <a href="/profile/${username}" style="color:inherit;text-decoration:none;">
+                            <div><b>${name}</b></div>
+                            <div class="text-muted small">@${username}</div>
+                        </a>
+                    </div>
+                </li>
+            `;
+        }).join('');
         $followersModalContent.html(`<ul class="list-group list-group-flush">${html}</ul>`);
     }
 
