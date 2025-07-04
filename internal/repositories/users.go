@@ -206,7 +206,7 @@ func (repository *users) IsFollowing(userID, followerID uint64) (bool, error) {
 // GetFollowers retrieves the followers of a user
 func (repository *users) GetFollowers(userID uint64) ([]models.User, error) {
 	rows, err := repository.db.Query(`
-		SELECT u.id, u.name, u.username, u.email, u.created_at
+		SELECT u.id, u.name, u.username, u.created_at
 		FROM users u inner join followers f on u.id = f.follower_id where f.user_id = ?`,
 		userID,
 	)
@@ -219,7 +219,7 @@ func (repository *users) GetFollowers(userID uint64) ([]models.User, error) {
 
 	for rows.Next() {
 		var user models.User
-		if err := rows.Scan(&user.ID, &user.Name, &user.Username, &user.Email, &user.CreatedAt); err != nil {
+		if err := rows.Scan(&user.ID, &user.Name, &user.Username, &user.CreatedAt); err != nil {
 			return nil, err
 		}
 		followers = append(followers, user)
@@ -231,7 +231,7 @@ func (repository *users) GetFollowers(userID uint64) ([]models.User, error) {
 // GetFollowing retrieves the users that a user is following
 func (repository *users) GetFollowing(userID uint64) ([]models.User, error) {
 	rows, err := repository.db.Query(`
-		SELECT u.id, u.name, u.username, u.email, u.created_at
+		SELECT u.id, u.name, u.username, u.created_at
 		FROM users u inner join followers f on u.id = f.user_id where f.follower_id = ?`,
 		userID,
 	)
@@ -244,7 +244,7 @@ func (repository *users) GetFollowing(userID uint64) ([]models.User, error) {
 
 	for rows.Next() {
 		var user models.User
-		if err := rows.Scan(&user.ID, &user.Name, &user.Username, &user.Email, &user.CreatedAt); err != nil {
+		if err := rows.Scan(&user.ID, &user.Name, &user.Username, &user.CreatedAt); err != nil {
 			return nil, err
 		}
 		following = append(following, user)
