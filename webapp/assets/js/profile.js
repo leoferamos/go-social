@@ -130,6 +130,28 @@ $(function () {
             method: 'POST',
             success: function (data) {
                 updateBtnFn($btn, data.following ?? data.is_following);
+
+                const $followersBtn = $('.profile-stat-btn.show-followers[data-user-id="' + userId + '"]');
+                if ($followersBtn.length) {
+                    const $countSpan = $followersBtn.find('.followers-count');
+                    let count = parseInt($countSpan.text(), 10);
+                    if (isFollowing) {
+                        $countSpan.text(count > 0 ? count - 1 : 0);
+                    } else {
+                        $countSpan.text(count + 1);
+                    }
+                }
+
+                const $followingBtn = $('.profile-stat-btn.show-following[data-user-id="' + currentUserId + '"]');
+                if ($followingBtn.length) {
+                    const $countSpan = $followingBtn.find('.following-count');
+                    let count = parseInt($countSpan.text(), 10);
+                    if (isFollowing) {
+                        $countSpan.text(count > 0 ? count - 1 : 0);
+                    } else {
+                        $countSpan.text(count + 1);
+                    }
+                }
             },
             error: function (xhr) {
                 showError(xhr, 'An error occurred while trying to follow/unfollow.');
