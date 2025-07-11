@@ -286,12 +286,6 @@ func GetFollowing(w http.ResponseWriter, r *http.Request) {
 
 // IsFollowing checks if the authenticated user is following the specified user.
 func IsFollowing(w http.ResponseWriter, r *http.Request) {
-	cookie, err := cookies.Read(r)
-	if err != nil {
-		responses.JSON(w, http.StatusUnauthorized, responses.ErrorAPI{Error: "Not authenticated"})
-		return
-	}
-	authUserID := cookie["id"]
 
 	vars := mux.Vars(r)
 	targetUserID := vars["userId"]
@@ -301,7 +295,7 @@ func IsFollowing(w http.ResponseWriter, r *http.Request) {
 		apiURL = "http://api:5000"
 	}
 
-	isFollowingURL := apiURL + "/users/" + authUserID + "/isFollowing/" + targetUserID
+	isFollowingURL := apiURL + "/users/isFollowing/" + targetUserID
 
 	response, err := requests.MakeAuthenticatedRequest(r, http.MethodGet, isFollowingURL, nil)
 	if err != nil {
@@ -311,15 +305,22 @@ func IsFollowing(w http.ResponseWriter, r *http.Request) {
 	defer response.Body.Close()
 
 	if response.StatusCode >= 400 {
-		responses.HandleStatusCode(w, response)
+		var apiErr responses.ErrorAPI
+		if err := json.NewDecoder(response.Body).Decode(&apiErr); err == nil && apiErr.Error != "" {
+			responses.JSON(w, response.StatusCode, apiErr)
+		} else {
+			responses.JSON(w, response.StatusCode, responses.ErrorAPI{Error: "Failed to check following status (API error)"})
+		}
 		return
 	}
 
-	var isFollowing bool
-	if err := json.NewDecoder(response.Body).Decode(&isFollowing); err != nil {
+	var result struct {
+		IsFollowing bool `json:"is_following"`
+	}
+	if err := json.NewDecoder(response.Body).Decode(&result); err != nil {
 		responses.JSON(w, http.StatusInternalServerError, responses.ErrorAPI{Error: "Failed to decode following status"})
 		return
 	}
 
-	responses.JSON(w, http.StatusOK, map[string]bool{"is_following": isFollowing})
+	responses.JSON(w, http.StatusOK, map[string]bool{"is_following": result.IsFollowing})
 }
