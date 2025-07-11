@@ -8,18 +8,12 @@
     <div class="profile-stats mt-3 d-flex gap-4">
         <span>
             <button type="button" class="profile-stat-btn show-following" data-user-id="{{ .Profile.User.ID }}">
-                {{ .Profile.User.Following }}
-            </button>
-            <button type="button" class="stat-label profile-stat-btn show-following" data-user-id="{{ .Profile.User.ID }}">
-                Following
+                <span class="following-count">{{ .Profile.User.Following }}</span> Following
             </button>
         </span>
         <span>
             <button type="button" class="profile-stat-btn show-followers" data-user-id="{{ .Profile.User.ID }}">
-                {{ .Profile.User.Followers }}
-            </button>
-            <button type="button" class="stat-label profile-stat-btn show-followers" data-user-id="{{ .Profile.User.ID }}">
-                Followers
+                <span class="followers-count">{{ .Profile.User.Followers }}</span> Followers
             </button>
         </span>
     </div>
