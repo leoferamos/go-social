@@ -296,6 +296,37 @@ func GetFollowing(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusOK, following)
 }
 
+// IsFollowing checks if the authenticated user is following the specified user
+func IsFollowing(w http.ResponseWriter, r *http.Request) {
+	userIDFromToken, err := auth.ExtractUserID(r)
+	if err != nil {
+		responses.JSONError(w, http.StatusUnauthorized, err)
+		return
+	}
+	parameters := mux.Vars(r)
+	userID, err := strconv.ParseUint(parameters["userId"], 10, 64)
+	if err != nil {
+		responses.JSONError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	db, err := db.Connect()
+	if err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+	defer db.Close()
+
+	repository := repositories.NewUsersRepository(db)
+	isFollowing, err := repository.IsFollowing(userID, userIDFromToken)
+	if err != nil {
+		responses.JSONError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	responses.JSON(w, http.StatusOK, map[string]bool{"is_following": isFollowing})
+}
+
 // ResetPassword resets the password of a user
 func ResetPassword(w http.ResponseWriter, r *http.Request) {
 	userIDFromToken, err := auth.ExtractUserID(r)
