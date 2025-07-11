@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="/assets/css/feed.css">
     <link rel="stylesheet" href="/assets/css/profile.css">
 </head>
-<body>
+<body data-current-user-id="{{ .UserID }}">
     {{ template "navbar" . }}
     <div class="container mt-4">
         <div class="row justify-content-center">
