@@ -1,4 +1,5 @@
 $(function () {
+    // --- Cached selectors ---
     const $editProfileModal = $('#edit-profile-modal');
     const $editProfileOverlay = $('#edit-profile-overlay');
     const $followersModal = $('#followers-modal');
@@ -9,40 +10,19 @@ $(function () {
     const $editProfileForm = $('#edit-profile-form');
     const $followBtn = $('#follow-btn');
 
-    // FOLLOW/UNFOLLOW BUTTON
+    const currentUserId = Number($('body').data('current-user-id'));
+
+    // --- Follow/Unfollow Button on Profile ---
     if ($followBtn.length) {
         updateFollowBtn($followBtn, Boolean($followBtn.data('is-following')));
-
         $followBtn.on('click', function () {
             const userId = $followBtn.data('user-id');
             const isFollowing = $followBtn.hasClass('following');
-
-            $.ajax({
-                url: isFollowing ? `/users/${userId}/unfollow` : `/users/${userId}/follow`,
-                method: 'POST',
-                success: function (data) {
-                    updateFollowBtn($followBtn, data.following);
-                },
-                error: function (xhr) {
-                    showError(xhr, 'An error occurred while trying to follow/unfollow.');
-                }
-            });
+            toggleFollow($followBtn, userId, isFollowing, updateFollowBtn);
         });
     }
 
-    function updateFollowBtn($btn, isFollowing) {
-        if (isFollowing) {
-            $btn.addClass('following btn-outline-primary')
-                .removeClass('btn-primary')
-                .text('Unfollow');
-        } else {
-            $btn.removeClass('following btn-outline-primary')
-                .addClass('btn-primary')
-                .text('Follow');
-        }
-    }
-
-    // EDIT PROFILE MODAL
+    // --- Edit Profile Modal ---
     $editProfileBtn.on('click', function () {
         const userId = $(this).data('user-id');
         const defaultAvatar = $editProfileBtn.data('avatar-url') || '/assets/img/avatar-placeholder.png';
@@ -102,7 +82,7 @@ $(function () {
         });
     });
 
-    // FOLLOWERS / FOLLOWING MODALS
+    // --- Followers / Following Modals ---
     $(document).on('click', '.show-followers', function (e) {
         e.preventDefault();
         const userId = $(this).data('user-id');
@@ -135,18 +115,54 @@ $(function () {
         $followersOverlay.add($followersModal).fadeOut(150);
     });
 
-    // UTILS
-    function renderFollowersList(users, emptyMsg) {
-        if (!Array.isArray(users) || !users.length) {
-            $followersModalContent.html(`<div class="text-center my-4" style="color: #E7E9EA;">${emptyMsg}</div>`);
-            return;
+    // --- Follow/Unfollow Button in List ---
+    $(document).on('click', '.follow-list-btn', function () {
+        const $btn = $(this);
+        const userId = $btn.data('user-id');
+        const isFollowing = $btn.hasClass('following');
+        toggleFollow($btn, userId, isFollowing, updateFollowListBtn);
+    });
+
+    // --- Helpers ---
+    function toggleFollow($btn, userId, isFollowing, updateBtnFn) {
+        $.ajax({
+            url: isFollowing ? `/users/${userId}/unfollow` : `/users/${userId}/follow`,
+            method: 'POST',
+            success: function (data) {
+                updateBtnFn($btn, data.following ?? data.is_following);
+            },
+            error: function (xhr) {
+                showError(xhr, 'An error occurred while trying to follow/unfollow.');
+            }
+        });
+    }
+
+    function updateFollowBtn($btn, isFollowing) {
+        if (isFollowing) {
+            $btn.addClass('following btn-outline-primary')
+                .removeClass('btn-primary')
+                .text('Unfollow')
+                .data('is-following', true);
+        } else {
+            $btn.removeClass('following btn-outline-primary')
+                .addClass('btn-primary')
+                .text('Follow')
+                .data('is-following', false);
         }
-        const html = users.map(user => {
-            const username = user.username || user.Username;
-            const name = user.name || user.Name;
-            const avatar = user.avatar_url || user.AvatarURL || '/assets/img/avatar-placeholder.png';
-            return `
-                <li class="list-group-item d-flex align-items-center gap-3">
+    }
+
+    function updateFollowListBtn($btn, isFollowing) {
+        updateFollowBtn($btn, isFollowing);
+    }
+
+    function userListItem(user, isFollowing) {
+        const username = user.username || user.Username;
+        const name = user.name || user.Name;
+        const avatar = user.avatar_url || user.AvatarURL || '/assets/img/avatar-placeholder.png';
+        const isSelf = currentUserId === user.id;
+        return `
+            <li class="list-group-item d-flex align-items-center gap-3 justify-content-between" data-user-id="${user.id}">
+                <div class="d-flex align-items-center gap-3">
                     <a href="/profile/${username}">
                         <img src="${avatar}" alt="Avatar" class="rounded-circle" style="width:40px;height:40px;object-fit:cover;">
                     </a>
@@ -156,10 +172,29 @@ $(function () {
                             <div class="text-muted small">@${username}</div>
                         </a>
                     </div>
-                </li>
-            `;
-        }).join('');
+                </div>
+                ${!isSelf ? `
+                    <button class="btn btn-sm ${isFollowing ? 'btn-outline-primary following' : 'btn-primary'} follow-list-btn" data-user-id="${user.id}" data-is-following="${isFollowing}">
+                        ${isFollowing ? 'Unfollow' : 'Follow'}
+                    </button>
+                ` : ''}
+            </li>
+        `;
+    }
+
+    function renderFollowersList(users, emptyMsg) {
+        if (!Array.isArray(users) || !users.length) {
+            $followersModalContent.html(`<div class="text-center my-4" style="color: #E7E9EA;">${emptyMsg}</div>`);
+            return;
+        }
+        const html = users.map(user => userListItem(user, user.is_following)).join('');
         $followersModalContent.html(`<ul class="list-group list-group-flush">${html}</ul>`);
+        users.forEach(user => {
+            $.get(`/users/isFollowing/${user.id}`, function(data) {
+                const $btn = $followersModalContent.find(`button[data-user-id="${user.id}"]`);
+                updateFollowListBtn($btn, data.is_following);
+            });
+        });
     }
 
     function showModalLoading() {
